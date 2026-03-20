@@ -172,10 +172,32 @@ body {
   flex: 1;
   background: var(--cream);
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: hidden; /* body scrolls, header does not */
+}
+
+/* Non-scrolling tab header */
+.sipa-right-header {
+  flex-shrink: 0;
+  background: var(--cream);
+  padding: 3rem 4rem 0;
+  display: flex;
   justify-content: center;
-  padding: 3rem 4rem;
+}
+.sipa-right-tabs-inner {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Scrollable form body */
+.sipa-right-body {
+  flex: 1;
   overflow-y: auto;
+  padding: 2rem 4rem 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .sipa-form-wrap {
@@ -362,12 +384,113 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   body { overflow: auto; }
   .sipa-root { flex-direction: column; height: auto; min-height: 100dvh; }
   .sipa-left { width: 100%; min-width: unset; padding: 2rem 1.8rem; }
   .sipa-brand-main { font-size: 3rem; }
   .sipa-brand-sub { font-size: 2.6rem; }
-  .sipa-right { padding: 2.5rem 1.8rem; }
+  .sipa-right { overflow: visible; }
+  .sipa-right-header { padding: 2rem 1.8rem 0; }
+  .sipa-right-body { padding: 1.5rem 1.8rem 2.5rem; overflow-y: visible; }
+  .sipa-row { flex-direction: column; }
 }
+
+/* ═══════════════════════════════════════════
+   REGISTER FORM ADDITIONS
+═══════════════════════════════════════════ */
+
+/* Two-column row */
+.sipa-row {
+  display: flex;
+  gap: 1rem;
+}
+.sipa-row .sipa-field {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Role selector */
+.sipa-role-group {
+  display: flex;
+  background: var(--white);
+  border: 1.5px solid var(--cream-dark);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.sipa-role-btn {
+  flex: 1;
+  padding: 0.75rem 0.4rem;
+  border: none;
+  background: transparent;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  font-family: inherit;
+}
+.sipa-role-btn:hover:not(.sipa-role-btn-active) {
+  background: var(--cream);
+  color: var(--text-mid);
+}
+.sipa-role-btn-active {
+  background: var(--sage-dark);
+  color: var(--white);
+}
+
+/* Password strength */
+.sipa-pw-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+}
+.sipa-pw-bars {
+  display: flex;
+  gap: 0.35rem;
+  flex: 1;
+}
+.sipa-pw-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 999px;
+  background: var(--cream-dark);
+  transition: background 0.25s;
+}
+
+/* Score 1 = Lemah (red) */
+.sipa-pw-bar-1 { background: #e74c3c; }
+/* Score 2 = Cukup (orange) */
+.sipa-pw-bar-2 { background: #e67e22; }
+/* Score 3 = Bagus (yellow-green) */
+.sipa-pw-bar-3 { background: #f0c040; }
+/* Score 4 = Kuat (teal) */
+.sipa-pw-bar-4 { background: #2ecc9b; }
+
+.sipa-pw-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  min-width: 38px;
+  text-align: right;
+}
+.sipa-pw-label-1 { color: #e74c3c; }
+.sipa-pw-label-2 { color: #e67e22; }
+.sipa-pw-label-3 { color: #c9a400; }
+.sipa-pw-label-4 { color: #27ae80; }
+
+/* Register submit button — teal gradient variant */
+.sipa-submit-register {
+  background: linear-gradient(90deg, #2ecc9b 0%, #1abc8c 100%);
+  box-shadow: 0 4px 18px rgba(46,204,155,0.3);
+  letter-spacing: 0.08em;
+}
+.sipa-submit-register:hover:not(:disabled) {
+  background: linear-gradient(90deg, #27b589 0%, #17a87e 100%);
+  box-shadow: 0 6px 24px rgba(46,204,155,0.4);
+}
+
