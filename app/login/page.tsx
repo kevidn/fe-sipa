@@ -37,6 +37,9 @@ export default function LoginPage() {
   const [regLoading, setRegLoading] = useState(false);
   const [regError, setRegError] = useState('');
 
+  // Notification state
+  const [toastMessage, setToastMessage] = useState('');
+
   const pwStrength = getPasswordStrength(regPassword);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,15 +47,31 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/login', {
+      const payload = {
+        username: nim,
+        password: password
+      };
+      console.log("Mencoba Login dengan:", payload);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nim_nip: nim, password }),
+        body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || 'NIM/NIP atau kata sandi salah.');
+        const data = await res.json().catch(() => null);
+        console.error("Detail Error Login:", data);
+        throw new Error(data?.error || data?.message || 'NIM/NIP atau kata sandi salah.');
       }
+
+      const successData = await res.json();
+      console.log("Login Berhasil:", successData);
+
+      if (successData.token) {
+        localStorage.setItem('sipa_token', successData.token);
+      }
+
       window.location.href = '/dashboard';
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan.');
@@ -66,23 +85,42 @@ export default function LoginPage() {
     setRegError('');
     setRegLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/register', {
+      const payload = {
+        nama_lengkap: regNama,
+        email: regEmail,
+        username: regNim,
+        phone_number: regWa,
+        role: regRole,
+        password: regPassword,
+      };
+      console.log("Mengirim data registrasi:", payload);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nama_lengkap: regNama,
-          email: regEmail,
-          nim_nip: regNim,
-          whatsapp: regWa,
-          role: regRole,
-          password: regPassword,
-        }),
+        body: JSON.stringify(payload),
       });
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || 'Pendaftaran gagal. Coba lagi.');
+        const data = await res.json().catch(() => null);
+        console.error("Detail Error Register Server:", data);
+        throw new Error(data?.error || data?.message || 'Pendaftaran gagal. Coba lagi.');
       }
-      window.location.href = '/login';
+
+      // Tampilkan Notifikasi Toast
+      setToastMessage('Pendaftaran berhasil! Silakan masuk dengan akun Anda.');
+
+      // Bonus UX: Pindahkan NIM ke form login otomatis agar tidak perlu ketik ulang
+      setNim(regNim);
+
+      // Pindah ke tab login otomatis
+      setActiveTab('masuk');
+
+      // Hilangkan notifikasi setelah 4 detik
+      setTimeout(() => {
+        setToastMessage('');
+      }, 4000);
+
     } catch (err: unknown) {
       setRegError(err instanceof Error ? err.message : 'Terjadi kesalahan.');
     } finally {
@@ -91,7 +129,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="sipa-root">
+    <div className="sipa-root relative">
+
+      {/* ── TOAST NOTIFICATION ── */}
+      {toastMessage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '24px',
+            right: '24px',
+            backgroundColor: '#10B981', // Warna hijau elegan (Emerald)
+            color: 'white',
+            padding: '16px 24px',
+            borderRadius: '8px',
+            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            transition: 'all 0.3s ease',
+            animation: 'fadeSlideIn 0.4s ease-out forwards'
+          }}
+        >
+          {/* Ikon Centang */}
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+          <span style={{ fontWeight: 500, fontSize: '15px' }}>
+            {toastMessage}
+          </span>
+        </div>
+      )}
+
+      {/* Tambahkan keyframes untuk animasi toast di dalam tag style (atau bisa dipindah ke globals.css nantinya) */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(-20px) translateX(20px); }
+          to { opacity: 1; transform: translateY(0) translateX(0); }
+        }
+      `}} />
+
       {/* ── LEFT PANEL ── */}
       <aside className="sipa-left">
         {/* Badge */}
