@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
 /* ── RESET & BASE ── */
@@ -18,14 +17,77 @@
   --text-muted:  #8a9e96;
   --white:       #ffffff;
   --error:       #c0392b;
+
+  /* Landing Page Design System (SIPA UNESA) */
+  --sipa-green:      #00a86b; /* Primary UNESA brand green */
+  --sipa-green-dark: #008f5d;
+  --sipa-green-bg:   #f0fdf4;
+  --sipa-navy:       #0f172a; /* Footer background */
+  --sipa-text:       #1e293b;
+  --sipa-text-dim:   #64748b;
+  --glass-bg:        rgba(255, 255, 255, 0.7);
+  --glass-border:    rgba(255, 255, 255, 0.3);
 }
 
 body {
-  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins), 'Inter', Arial, Helvetica, sans-serif;
   background: var(--cream);
   color: var(--text-dark);
-  height: 100dvh;
-  overflow: hidden;
+}
+/* Landing Page Base Styling */
+.landing-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.btn-primary {
+  background: var(--sipa-green);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  background: var(--sipa-green-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 168, 107, 0.2);
+}
+.btn-secondary {
+  background: white;
+  color: var(--sipa-text);
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  border: 1px solid var(--cream-dark);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background: var(--cream);
+  border-color: var(--text-muted);
+}
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+.text-gradient {
+  background: linear-gradient(135deg, var(--sipa-green) 0%, #2ecc71 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* ═══════════════════════════════════════════
@@ -34,7 +96,7 @@ body {
 
 .sipa-root {
   display: flex;
-  height: 100dvh;
+  height: 100vh;
   width: 100%;
 }
 
@@ -109,14 +171,14 @@ body {
   line-height: 1;
 }
 .sipa-brand-main {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-poppins), serif;
   font-size: 4.5rem;
   font-weight: 700;
   color: var(--white);
   letter-spacing: -0.02em;
 }
 .sipa-brand-sub {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-poppins), serif;
   font-size: 4rem;
   font-weight: 700;
   font-style: italic;
@@ -181,12 +243,49 @@ body {
 .sipa-right-header {
   flex-shrink: 0;
   background: var(--cream);
-  padding: 3rem 4rem 0;
+  padding: 2.5rem 4rem 1.5rem;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
 }
+.sipa-home-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.sipa-home-logo:hover { opacity: 0.8; }
+
+.sipa-home-logo .logo-icon {
+  background: var(--sipa-green);
+  color: white;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.sipa-home-logo .logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.sipa-home-logo .logo-text strong {
+  font-size: 1.05rem;
+  color: var(--sipa-text);
+  letter-spacing: 0.02em;
+}
+.sipa-home-logo .logo-text span {
+  font-size: 0.65rem;
+  color: var(--sipa-text-dim);
+}
+
 .sipa-right-tabs-inner {
-  width: 100%;
+  width: auto;
   max-width: 440px;
 }
 
@@ -246,7 +345,7 @@ body {
 /* Heading */
 .sipa-heading { margin-bottom: 2rem; }
 .sipa-heading-title {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-poppins), serif;
   font-size: 2.4rem;
   font-weight: 700;
   color: var(--text-dark);

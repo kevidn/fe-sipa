@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 type Role = 'MAHASISWA' | 'TENDIK' | 'KAPRODI';
 
@@ -18,6 +19,17 @@ function getPasswordStrength(pw: string): { score: number; label: string } {
 }
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="sipa-root flex items-center justify-center min-h-screen">Memuat...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+
   // Login state
   const [nim, setNim] = useState('');
   const [password, setPassword] = useState('');
@@ -39,6 +51,14 @@ export default function LoginPage() {
 
   // Notification state
   const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    if (tabParam === 'daftar') {
+      setActiveTab('daftar');
+    } else {
+      setActiveTab('masuk');
+    }
+  }, [tabParam]);
 
   const pwStrength = getPasswordStrength(regPassword);
 
@@ -219,6 +239,13 @@ export default function LoginPage() {
       <main className="sipa-right">
         {/* ── Tab nav — always visible, never scrolls away ── */}
         <div className="sipa-right-header">
+          <Link href="/" className="sipa-home-logo" aria-label="Kembali ke Beranda">
+            <div className="logo-icon">SU</div>
+            <div className="logo-text">
+              <strong>SIPA UNESA</strong>
+              <span>Sistem Pelayanan Akademik</span>
+            </div>
+          </Link>
           <div className="sipa-right-tabs-inner">
             <nav className="sipa-tabs">
               <button
