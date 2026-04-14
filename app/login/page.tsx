@@ -92,7 +92,17 @@ function LoginContent() {
         localStorage.setItem('sipa_token', successData.token);
       }
 
-      window.location.href = '/dashboard';
+      if (successData.data) {
+        localStorage.setItem('sipa_user', JSON.stringify(successData.data));
+      }
+
+      // Redirect berdasarkan role
+      const role = successData.data?.role?.toUpperCase();
+      if (role === 'MAHASISWA') {
+        window.location.href = '/dashboard/mahasiswa';
+      } else {
+        window.location.href = '/dashboard';
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan.');
     } finally {

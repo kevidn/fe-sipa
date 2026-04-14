@@ -1,7 +1,14 @@
 @import "tailwindcss";
 
-/* ── RESET & BASE ── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+
+@theme {
+  --color-sipa-green: #00a86b;
+  --color-sipa-green-dark: #008f5d;
+  --color-sipa-green-bg: #f0fdf4;
+  --color-sipa-navy: #0f172a;
+}
 
 :root {
   --sage:        #5a7a6e;
