@@ -6,6 +6,7 @@ interface UserData {
   nama_lengkap: string;
   role: string;
   username: string;
+  id_user: string;
 }
 
 export default function DashboardHeader() {
