@@ -149,16 +149,16 @@ export default function AjukanSuratBaru() {
       {showModal.show && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={closeModal}></div>
-          <div className="relative bg-white rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 text-center">
-            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 ${showModal.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+          <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 text-center border border-slate-100 dark:border-slate-800">
+            <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 ${showModal.type === 'success' ? 'bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400'}`}>
               {showModal.type === 'success' ? (
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               ) : (
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               )}
             </div>
-            <h3 className="text-2xl font-black text-slate-800 mb-2">{showModal.type === 'success' ? 'Berhasil!' : 'Terjadi Kesalahan'}</h3>
-            <p className="text-slate-500 font-medium mb-8 leading-relaxed">{showModal.message}</p>
+            <h3 className="text-2xl font-black text-slate-800 dark:text-slate-100 mb-2">{showModal.type === 'success' ? 'Berhasil!' : 'Terjadi Kesalahan'}</h3>
+            <p className="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">{showModal.message}</p>
             <button 
               onClick={closeModal}
               className={`w-full py-4 rounded-2xl font-black text-white shadow-xl transition-all active:scale-95 ${showModal.type === 'success' ? 'bg-sipa-green shadow-sipa-green/20' : 'bg-red-500 shadow-red-500/20'}`}
@@ -181,7 +181,7 @@ export default function AjukanSuratBaru() {
       </Link>
 
       {/* Hero Card */}
-      <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden border border-slate-100 dark:border-slate-800 transition-colors duration-300">
         <div className="bg-sipa-green p-10 flex items-center gap-8">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -206,15 +206,15 @@ export default function AjukanSuratBaru() {
                 onClick={() => setSelectedLetter(type.id)}
                 className={`flex items-start gap-5 p-6 rounded-3xl border-2 text-left transition-all duration-300 group
                   ${selectedLetter === type.id 
-                    ? 'border-sipa-green bg-sipa-green/[0.03] shadow-lg shadow-sipa-green/[0.05]' 
-                    : 'border-slate-100 hover:border-slate-300 hover:bg-slate-50'
+                    ? 'border-sipa-green bg-sipa-green/[0.03] dark:bg-sipa-green/5 shadow-lg shadow-sipa-green/[0.05]' 
+                    : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                   }`}
               >
                 <div className="mt-1 flex-shrink-0">
                   {type.icon(selectedLetter === type.id)}
                 </div>
                 <div>
-                  <h3 className={`font-bold transition-colors ${selectedLetter === type.id ? 'text-sipa-green' : 'text-slate-800'}`}>
+                  <h3 className={`font-bold transition-colors ${selectedLetter === type.id ? 'text-sipa-green' : 'text-slate-800 dark:text-slate-200'}`}>
                     {type.title}
                   </h3>
                   <p className="text-xs text-slate-400 font-bold mt-1.5 uppercase tracking-wide">
@@ -235,7 +235,7 @@ export default function AjukanSuratBaru() {
                     type="text" 
                     value={user?.nama_lengkap || ''} 
                     readOnly 
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-slate-500 font-bold focus:outline-none cursor-not-allowed"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-500 dark:text-slate-400 font-bold focus:outline-none cursor-not-allowed"
                   />
                 </div>
                 <div className="space-y-2">
@@ -244,7 +244,7 @@ export default function AjukanSuratBaru() {
                     type="text" 
                     value={user?.username || ''} 
                     readOnly 
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-slate-500 font-bold focus:outline-none cursor-not-allowed"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-500 dark:text-slate-400 font-bold focus:outline-none cursor-not-allowed"
                   />
                 </div>
                 <div className="space-y-2">
@@ -253,7 +253,7 @@ export default function AjukanSuratBaru() {
                     type="text" 
                     value={user?.program_studi || 'Pendidikan Teknologi Informasi'} 
                     readOnly 
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-slate-500 font-bold focus:outline-none cursor-not-allowed"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-500 dark:text-slate-400 font-bold focus:outline-none cursor-not-allowed"
                   />
                 </div>
                 <div className="space-y-2">
@@ -261,12 +261,12 @@ export default function AjukanSuratBaru() {
                   <select 
                     value={semester}
                     onChange={(e) => setSemester(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 text-slate-800 font-bold focus:ring-2 focus:ring-sipa-green/20 focus:border-sipa-green outline-none transition-all appearance-none"
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-800 dark:text-slate-200 font-bold focus:ring-2 focus:ring-sipa-green/20 focus:border-sipa-green outline-none transition-all appearance-none"
                     required
                   >
-                    <option value="">Pilih Semester</option>
+                    <option value="" className="dark:bg-slate-900">Pilih Semester</option>
                     {[1,2,3,4,5,6,7,8,9,10,11,12,13,14].map(s => (
-                      <option key={s} value={s.toString()}>Semester {s}</option>
+                      <option key={s} value={s.toString()} className="dark:bg-slate-900">Semester {s}</option>
                     ))}
                   </select>
                 </div>
@@ -278,34 +278,34 @@ export default function AjukanSuratBaru() {
                   value={keperluan}
                   onChange={(e) => setKeperluan(e.target.value)}
                   placeholder="Jelaskan keperluan pengajuan surat..."
-                  className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 text-slate-800 font-bold focus:ring-2 focus:ring-sipa-green/20 focus:border-sipa-green outline-none transition-all min-h-[150px]"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-800 dark:text-slate-200 font-bold focus:ring-2 focus:ring-sipa-green/20 focus:border-sipa-green outline-none transition-all min-h-[150px]"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Dokumen Pendukung (opsional)</label>
-                <div className="border-2 border-dashed border-slate-200 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:border-sipa-green/50 hover:bg-sipa-green/[0.02] transition-all cursor-pointer relative group">
+                <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:border-sipa-green/50 hover:bg-sipa-green/[0.02] dark:hover:bg-sipa-green/5 transition-all cursor-pointer relative group">
                   <input 
                     type="file" 
                     onChange={handleFileChange}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
-                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-sipa-green transition-colors">
+                  <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-sipa-green transition-colors">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                     </svg>
                   </div>
                   <div className="text-center">
-                    <p className="font-bold text-slate-600">{file ? file.name : 'Klik untuk upload file'}</p>
+                    <p className="font-bold text-slate-600 dark:text-slate-300">{file ? file.name : 'Klik untuk upload file'}</p>
                     <p className="text-xs text-slate-400 font-medium mt-1">PDF, JPG, PNG (Max 5MB)</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-100 rounded-[2rem] p-8 space-y-3">
-                <h4 className="text-blue-800 font-black text-xs uppercase tracking-widest">Catatan Penting:</h4>
-                <ul className="text-sm text-blue-700/80 font-medium space-y-2 list-disc list-inside">
+              <div className="bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/20 rounded-[2rem] p-8 space-y-3">
+                <h4 className="text-blue-800 dark:text-blue-300 font-black text-xs uppercase tracking-widest">Catatan Penting:</h4>
+                <ul className="text-sm text-blue-700/80 dark:text-blue-400/80 font-medium space-y-2 list-disc list-inside">
                   <li>Pastikan semua data yang diisi sudah benar</li>
                   <li>Anda akan menerima email konfirmasi setelah pengajuan berhasil</li>
                   <li>Kitir digital sebagai bukti pengajuan akan langsung diterbitkan</li>

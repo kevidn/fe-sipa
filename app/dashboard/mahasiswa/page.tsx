@@ -16,9 +16,12 @@ interface Pengajuan {
   nomor_surat: string;
   jenis_surat: string;
   created_at: string;
-  status: 'Selesai' | 'Diproses' | 'Diterima Tendik' | 'Ditolak';
+  status: 'Diajukan' | 'Selesai' | 'Diproses' | 'Diterima Tendik' | 'Ditolak';
+  sla_status: 'Aman' | 'Mendekati' | 'Terlampaui';
   file_url?: string;
 }
+
+import { printKitir } from '@/utils/printKitir';
 
 export default function MahasiswaDashboard() {
   const router = useRouter();
@@ -26,6 +29,8 @@ export default function MahasiswaDashboard() {
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<Pengajuan[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
 
   const fetchHistory = async () => {
     setRefreshing(true);
@@ -73,7 +78,7 @@ export default function MahasiswaDashboard() {
 
   const stats = [
     { label: 'Total Pengajuan', value: history.length, icon: 'file-text', color: 'blue' },
-    { label: 'Dalam Proses', value: history.filter(h => h.status === 'Diproses' || h.status === 'Diterima Tendik').length, icon: 'clock', color: 'orange' },
+    { label: 'Dalam Proses', value: history.filter(h => ['Diajukan', 'Diterima Tendik', 'Diproses'].includes(h.status)).length, icon: 'clock', color: 'orange' },
     { label: 'Selesai', value: history.filter(h => h.status === 'Selesai').length, icon: 'check-circle', color: 'green' },
     { label: 'Ditolak', value: history.filter(h => h.status === 'Ditolak').length, icon: 'x-circle', color: 'red' },
   ];
@@ -99,20 +104,20 @@ export default function MahasiswaDashboard() {
     <>
       {/* --- WELCOME SECTION --- */}
       <section className="mb-10">
-        <h2 className="text-4xl font-black mb-2 tracking-tight text-slate-800 uppercase">Halo, {user?.nama_lengkap.split(' ')[0]}!</h2>
+        <h2 className="text-4xl font-black mb-2 tracking-tight text-slate-800 dark:text-white uppercase">Halo, {user?.nama_lengkap.split(' ')[0]}!</h2>
         <p className="text-base text-slate-400 font-medium">Selamat datang kembali! Kelola pengajuan surat Anda di sini.</p>
       </section>
 
       {/* --- STATS CARDS --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         {stats.map((stat, idx) => (
-          <div key={idx} className="bg-white p-7 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 group">
+          <div key={idx} className="bg-white dark:bg-slate-900 p-7 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-sm flex items-center justify-between hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-slate-900/50 transition-all duration-300 group">
             <div className="flex flex-col gap-4">
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-300 shadow-lg
-                ${stat.color === 'blue' ? 'bg-[#3b82f6] text-white shadow-blue-200' : ''}
-                ${stat.color === 'orange' ? 'bg-[#f97316] text-white shadow-orange-200' : ''}
-                ${stat.color === 'green' ? 'bg-[#10b981] text-white shadow-green-200' : ''}
-                ${stat.color === 'red' ? 'bg-[#ef4444] text-white shadow-red-200' : ''}
+                ${stat.color === 'blue' ? 'bg-[#3b82f6] text-white shadow-blue-200 dark:shadow-blue-900/20' : ''}
+                ${stat.color === 'orange' ? 'bg-[#f97316] text-white shadow-orange-200 dark:shadow-orange-900/20' : ''}
+                ${stat.color === 'green' ? 'bg-[#10b981] text-white shadow-green-200 dark:shadow-green-900/20' : ''}
+                ${stat.color === 'red' ? 'bg-[#ef4444] text-white shadow-red-200 dark:shadow-red-900/20' : ''}
               `}>
                 {stat.icon === 'file-text' && <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>}
                 {stat.icon === 'clock' && <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
@@ -121,7 +126,7 @@ export default function MahasiswaDashboard() {
               </div>
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{stat.label}</span>
             </div>
-            <span className="text-4xl font-extrabold text-slate-800 tracking-tighter">{stat.value}</span>
+            <span className="text-4xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tighter">{stat.value}</span>
           </div>
         ))}
       </div>
@@ -150,16 +155,16 @@ export default function MahasiswaDashboard() {
       </section>
 
       {/* --- RIWAYAT TABLE --- */}
-      <section className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden mb-12">
-        <div className="p-8 sm:p-10 border-b border-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <section className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden mb-12 transition-colors duration-300">
+        <div className="p-8 sm:p-10 border-b border-slate-50 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 className="font-black text-2xl text-slate-800 tracking-tight">Riwayat Pengajuan</h3>
+            <h3 className="font-black text-2xl text-slate-800 dark:text-white tracking-tight">Riwayat Pengajuan</h3>
             <p className="text-sm text-slate-400 font-medium mt-1">Daftar pengajuan surat yang Anda lakukan baru-baru ini.</p>
           </div>
           <button 
             onClick={fetchHistory}
             disabled={refreshing}
-            className="flex items-center justify-center gap-2 text-xs font-black text-slate-400 hover:text-sipa-green bg-slate-50 hover:bg-sipa-green/10 px-6 py-3.5 rounded-2xl transition-all duration-300 active:scale-95 w-full sm:w-auto uppercase tracking-widest disabled:opacity-50"
+            className="flex items-center justify-center gap-2 text-xs font-black text-slate-400 hover:text-sipa-green bg-slate-50 dark:bg-slate-800 hover:bg-sipa-green/10 dark:hover:bg-sipa-green/10 px-6 py-3.5 rounded-2xl transition-all duration-300 active:scale-95 w-full sm:w-auto uppercase tracking-widest disabled:opacity-50"
           >
             <svg className={refreshing ? 'animate-spin' : ''} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6m12-4a9 9 0 0 1-15 6.7L3 16"/></svg>
             {refreshing ? 'REFRESHING...' : 'REFRESH'}
@@ -169,7 +174,7 @@ export default function MahasiswaDashboard() {
         <div className="overflow-x-auto p-4">
           <table className="w-full text-left min-w-[900px]">
             <thead>
-              <tr className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
+              <tr className="text-xs font-black text-slate-400 uppercase tracking-widest border-b border-slate-50 dark:border-slate-800">
                 <th className="px-8 py-6">No. Pengajuan</th>
                 <th className="px-8 py-6">Jenis Surat</th>
                 <th className="px-8 py-6">Tanggal Ajukan</th>
@@ -177,12 +182,12 @@ export default function MahasiswaDashboard() {
                 <th className="px-8 py-6 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
               {history.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-8 py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200">
+                      <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-200 dark:text-slate-700">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                       </div>
                       <p className="text-sm font-bold text-slate-400">Belum ada riwayat pengajuan surat.</p>
@@ -190,22 +195,35 @@ export default function MahasiswaDashboard() {
                   </td>
                 </tr>
               ) : (
-                history.map((item, idx) => (
-                  <tr key={idx} className="group hover:bg-slate-50/50 transition-all duration-300">
+                history.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((item, idx) => (
+                  <tr key={idx} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-all duration-300">
                     <td className="px-8 py-8">
-                      <span className="text-sm font-black text-slate-800 group-hover:text-sipa-green transition-colors">{item.nomor_surat}</span>
+                      <span className="text-sm font-black text-slate-800 dark:text-slate-200 group-hover:text-sipa-green transition-colors">{item.nomor_surat}</span>
                     </td>
                     <td className="px-8 py-8">
-                      <p className="text-sm font-bold text-slate-600">{item.jenis_surat}</p>
+                      <p className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">{item.jenis_surat}</p>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          item.sla_status === 'Terlampaui' ? 'bg-red-500' :
+                          item.sla_status === 'Mendekati' ? 'bg-amber-400' : 'bg-emerald-400'
+                        }`} />
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${
+                          item.sla_status === 'Terlampaui' ? 'text-red-500' :
+                          item.sla_status === 'Mendekati' ? 'text-amber-500' : 'text-emerald-500'
+                        }`}>
+                          SLA: {item.sla_status || 'Aman'}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-8 py-8 text-sm font-semibold text-slate-400">{formatTanggal(item.created_at)}</td>
                     <td className="px-8 py-8">
                       <div className="flex justify-center">
                         <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border shadow-sm
-                          ${item.status === 'Selesai' ? 'bg-green-50 text-green-600 border-green-100' : ''}
-                          ${item.status === 'Diproses' ? 'bg-blue-50 text-blue-600 border-blue-100' : ''}
-                          ${item.status === 'Diterima Tendik' ? 'bg-purple-50 text-purple-600 border-purple-100' : ''}
-                          ${item.status === 'Ditolak' ? 'bg-red-50 text-red-600 border-red-100' : ''}
+                          ${item.status === 'Selesai' ? 'bg-green-50 dark:bg-green-500/10 text-green-600 dark:text-green-400 border-green-100 dark:border-green-500/20' : ''}
+                          ${item.status === 'Diajukan' ? 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-700' : ''}
+                          ${item.status === 'Diproses' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' : ''}
+                          ${item.status === 'Diterima Tendik' ? 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20' : ''}
+                          ${item.status === 'Ditolak' ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-100 dark:border-red-500/20' : ''}
                         `}>
                           {item.status}
                         </span>
@@ -213,10 +231,16 @@ export default function MahasiswaDashboard() {
                     </td>
                     <td className="px-8 py-8">
                       <div className="flex justify-end gap-3 text-right">
-                        <button className="bg-white border border-slate-100 p-3 rounded-xl text-slate-300 hover:text-sipa-green hover:border-sipa-green hover:shadow-lg transition-all duration-300 active:scale-90" title="Download">
+                        <button 
+                          onClick={() => printKitir(item)}
+                          className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-xl text-slate-300 hover:text-sipa-green hover:border-sipa-green hover:shadow-lg transition-all duration-300 active:scale-90" title="Download Kitir"
+                        >
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         </button>
-                        <button className="bg-white border border-slate-100 p-3 rounded-xl text-slate-300 hover:text-blue-500 hover:border-blue-500 hover:shadow-lg transition-all duration-300 active:scale-90" title="Detail">
+                        <button 
+                          onClick={() => router.push(`/dashboard/pengajuan/${item.id}`)}
+                          className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-3 rounded-xl text-slate-300 hover:text-blue-500 hover:border-blue-500 hover:shadow-lg transition-all duration-300 active:scale-90" title="Detail Pengajuan"
+                        >
                           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg>
                         </button>
                       </div>
@@ -228,9 +252,28 @@ export default function MahasiswaDashboard() {
           </table>
         </div>
         
-        <div className="p-8 sm:p-10 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Menampilkan {history.length} pengajuan</span>
-          <Link href="/dashboard/pengajuan" className="group flex items-center gap-3 bg-sipa-green text-white px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-sipa-green/20 hover:shadow-2xl hover:-translate-x-1 transition-all duration-300 active:scale-95">
+        <div className="p-8 sm:p-10 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors duration-300">
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Hal. {currentPage} / {Math.ceil(history.length / itemsPerPage) || 1}</span>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-sipa-green disabled:opacity-50 transition-all"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(history.length / itemsPerPage), p + 1))}
+                disabled={currentPage >= Math.ceil(history.length / itemsPerPage)}
+                className="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-sipa-green disabled:opacity-50 transition-all"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+          
+          <Link href="/dashboard/pengajuan" className="group flex items-center gap-3 bg-sipa-green text-white px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-xl shadow-sipa-green/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 active:scale-95">
             LIHAT SEMUA
             <svg className="group-hover:translate-x-2 transition-transform duration-300" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </Link>

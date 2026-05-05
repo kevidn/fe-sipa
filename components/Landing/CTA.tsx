@@ -5,84 +5,97 @@ export default function CTA() {
   return (
     <section className="cta">
       <div className="landing-container">
-        <div className="cta-box">
+        <div className="cta-box animate-in zoom-in duration-1000">
           <div className="cta-content">
-            <h2>Siap Memulai?</h2>
-            <p>
-              Bergabunglah dengan ribuan mahasiswa yang telah merasakan <br />
-              kemudahan layanan akademik digital
+            <h2 className="text-white">Siap Memulai?</h2>
+            <p className="text-white/80">
+              Bergabunglah dengan ribuan mahasiswa yang telah merasakan kemudahan layanan akademik digital
             </p>
-            <Link href="/login" className="cta-btn btn-primary-white">
-              Akses SIPA UNESA →
+            <Link href="/login" className="cta-btn group">
+              Akses SIPA UNESA 
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform ml-2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </Link>
           </div>
-          <div className="cta-deco"></div>
+          
+          {/* Decorative shapes */}
+          <div className="cta-shape shape-1"></div>
+          <div className="cta-shape shape-2"></div>
         </div>
       </div>
 
       <style jsx>{`
         .cta {
-          padding: 6rem 0;
+          padding: 6rem 0 8rem;
         }
         .cta-box {
-          background: var(--sipa-green);
-          background: linear-gradient(135deg, var(--sipa-green) 0%, #10b981 100%);
-          border-radius: 40px;
-          padding: 5rem 3rem;
+          background: #00a86b;
+          border-radius: 3.5rem;
+          padding: 6rem 4rem;
           position: relative;
           overflow: hidden;
           text-align: center;
-          color: white;
-          box-shadow: 0 30px 60px rgba(0, 168, 107, 0.2);
+          box-shadow: 0 40px 80px rgba(0, 168, 107, 0.2);
         }
         .cta-content {
           position: relative;
-          z-index: 2;
+          z-index: 5;
+          max-width: 700px;
+          margin: 0 auto;
         }
         .cta-box h2 {
-          font-size: 3rem;
-          font-weight: 800;
+          font-size: 3.5rem;
+          font-weight: 900;
           margin-bottom: 1.5rem;
-          letter-spacing: -0.02em;
+          letter-spacing: -0.04em;
         }
         .cta-box p {
           font-size: 1.25rem;
-          opacity: 0.9;
-          margin-bottom: 3rem;
+          margin-bottom: 3.5rem;
           line-height: 1.6;
+          font-weight: 500;
         }
         .cta-btn {
           background: white;
-          color: var(--sipa-green-dark);
-          padding: 1rem 2.5rem;
-          border-radius: 12px;
-          font-weight: 700;
+          color: #00a86b;
+          padding: 1.2rem 3rem;
+          border-radius: 1.25rem;
+          font-weight: 900;
           font-size: 1.1rem;
           text-decoration: none;
-          display: inline-block;
+          display: inline-flex;
+          align-items: center;
           transition: all 0.3s ease;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
         .cta-btn:hover {
-          transform: translateY(-4px) scale(1.02);
-          background: #f0fdf4;
-          box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+          transform: translateY(-5px) scale(1.02);
+          background: #f8fafc;
+          box-shadow: 0 20px 45px rgba(0,0,0,0.15);
         }
-        .cta-deco {
+        .cta-shape {
           position: absolute;
-          top: -50%;
-          right: -10%;
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+          background: rgba(255, 255, 255, 0.1);
           border-radius: 50%;
+          pointer-events: none;
+        }
+        .shape-1 {
+          width: 400px;
+          height: 400px;
+          top: -200px;
+          right: -100px;
+        }
+        .shape-2 {
+          width: 300px;
+          height: 300px;
+          bottom: -150px;
+          left: -50px;
         }
         @media (max-width: 768px) {
           .cta-box {
             padding: 4rem 2rem;
-            border-radius: 30px;
+            border-radius: 2.5rem;
           }
-          .cta-box h2 { font-size: 2rem; }
+          .cta-box h2 { font-size: 2.5rem; }
           .cta-box p { font-size: 1rem; }
         }
       `}</style>
