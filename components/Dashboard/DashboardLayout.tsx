@@ -9,7 +9,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-[#fcfbf9] text-slate-800 font-sans selection:bg-sipa-green/10 selection:text-sipa-green">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans selection:bg-sipa-green/10 selection:text-sipa-green transition-colors duration-300">
       {/* Sidebar - Fixed on the left */}
       <Sidebar />
 
