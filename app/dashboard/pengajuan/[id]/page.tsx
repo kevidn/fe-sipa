@@ -20,7 +20,7 @@ interface Pengajuan {
   jenis_surat: string;
   keperluan: string;
   semester: string;
-  status: 'Selesai' | 'Diproses' | 'Diterima Tendik' | 'Ditolak';
+  status: 'Diajukan' | 'Selesai' | 'Diproses' | 'Diterima Tendik' | 'Ditolak';
   file_url?: string;
   komentar?: string;
   created_at: string;
