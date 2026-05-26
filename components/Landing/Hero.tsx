@@ -283,20 +283,190 @@ export default function Hero() {
         }
 
         @media (max-width: 992px) {
+          .hero {
+            padding: 6.5rem 0 4rem;
+          }
           .hero-content {
-            grid-template-columns: 1fr;
-            text-align: center;
-            gap: 4rem;
+            grid-template-columns: 1.15fr 0.85fr;
+            text-align: left;
+            gap: 2rem;
+            align-items: center;
+          }
+          .badge {
+            font-size: 0.65rem;
+            padding: 0.4rem 0.8rem;
+            margin-bottom: 1rem;
           }
           .badge, .hero-description, .stats-row, .hero-actions {
-            margin-left: auto;
-            margin-right: auto;
+            margin-left: 0;
+            margin-right: 0;
           }
-          .stats-row { justify-content: center; }
-          h1 { font-size: 3rem; }
-          .hero-right {
-            max-width: 500px;
-            margin: 0 auto;
+          h1 { 
+            font-size: 2.2rem; 
+            margin-bottom: 1rem;
+            line-height: 1.15;
+          }
+          .hero-description { 
+            font-size: 0.9rem; 
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+          }
+          .hero-actions { 
+            gap: 0.75rem; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap; 
+          }
+          .stats-row { 
+            gap: 1rem; 
+          }
+          .stat-value { 
+            font-size: 1.4rem; 
+          }
+          .stat-label { 
+            font-size: 0.7rem; 
+          }
+          .stat-divider { 
+            height: 25px; 
+          }
+          .status-card {
+            padding: 1.5rem;
+            border-radius: 2rem;
+          }
+          .card-header {
+            margin-bottom: 1.5rem;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: flex-start;
+          }
+          .status-badge {
+            align-self: flex-start;
+          }
+          .timeline {
+            gap: 1rem;
+          }
+          .time-content h4 {
+            font-size: 0.85rem;
+          }
+          .time-content p {
+            font-size: 0.7rem;
+          }
+          .btn-download-kitir {
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 1rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero {
+            padding: 5.5rem 0 3rem;
+          }
+          .hero-content {
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.25rem;
+          }
+          .badge {
+            display: none; /* Hide badge on very small screens to save space */
+          }
+          h1 {
+            font-size: 1.6rem;
+            line-height: 1.2;
+          }
+          .hero-description {
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+          }
+          .hero-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+          }
+          .hero-actions a {
+            width: 100%;
+            text-align: center;
+            justify-content: center;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.8rem;
+            border-radius: 10px;
+          }
+          .stats-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+          }
+          .stat-value {
+            font-size: 1.2rem;
+          }
+          .stat-label {
+            font-size: 0.65rem;
+          }
+          .stat-divider {
+            display: none;
+          }
+          .status-card {
+            padding: 1rem;
+            border-radius: 1.5rem;
+          }
+          .card-header {
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+          }
+          .header-left {
+            gap: 0.5rem;
+          }
+          .icon-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+          }
+          .icon-circle svg {
+            width: 14px;
+            height: 14px;
+          }
+          .header-left h3 {
+            font-size: 0.8rem;
+          }
+          .status-badge {
+            font-size: 0.6rem;
+            padding: 0.25rem 0.6rem;
+          }
+          .timeline {
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+          }
+          .timeline-item {
+            gap: 0.75rem;
+          }
+          .timeline-item:not(:last-child)::after {
+            left: 7px;
+            top: 18px;
+            height: calc(0.75rem + 12px);
+          }
+          .time-icon {
+            width: 16px;
+            height: 16px;
+          }
+          .time-icon svg {
+            width: 8px;
+            height: 8px;
+          }
+          .time-content h4 {
+            font-size: 0.7rem;
+            margin-bottom: 0.1rem;
+          }
+          .time-content p {
+            font-size: 0.6rem;
+          }
+          .btn-download-kitir {
+            padding: 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 10px;
+            gap: 0.5rem;
+          }
+          .btn-download-kitir svg {
+            width: 14px;
+            height: 14px;
           }
         }
       `}</style>
