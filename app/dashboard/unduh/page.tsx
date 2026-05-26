@@ -2,215 +2,196 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { printKitir } from '@/utils/printKitir';
 
 interface User {
-  id_user: string;
   nama_lengkap: string;
+  nim: string;
+  program_studi: string;
 }
 
 interface Pengajuan {
   id: number;
-  id_user: string;
-  user: User;
   nomor_surat: string;
   jenis_surat: string;
-  status: string;
   created_at: string;
-  updated_at: string;
+  status: string;
+  user: User;
 }
 
 export default function UnduhKitir() {
-  const [history, setHistory] = useState<Pengajuan[]>([]);
-  const [search, setSearch] = useState('');
+  const [pengajuan, setPengajuan] = useState<Pengajuan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedKitir, setSelectedKitir] = useState<Pengajuan | null>(null);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('sipa_token');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPengajuan(data.data);
+      }
+    } catch (err) {
+      console.error('Gagal mengambil data surat:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const token = localStorage.getItem('sipa_token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          // Filter only completed or submitted ones that have kitir
-          setHistory(data.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchHistory();
+    fetchData();
   }, []);
 
-  const filteredHistory = history.filter(item => 
-    item.nomor_surat.toLowerCase().includes(search.toLowerCase()) ||
-    item.jenis_surat.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleDownload = (item: Pengajuan) => {
-    printKitir(item);
+  const handlePrint = () => {
+    window.print();
   };
 
   const formatTanggal = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
+    return new Date(dateStr).toLocaleString('id-ID', {
+      day: '2-digit', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     });
   };
 
   return (
-    <div className="space-y-8 pb-20">
-      {/* Header Section */}
-      <div className="space-y-2">
-        <Link 
-          href="/dashboard/mahasiswa" 
-          className="inline-flex items-center gap-2 text-sipa-green font-bold hover:gap-3 transition-all group mb-4"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
-          </svg>
-          Kembali ke Dashboard
-        </Link>
-        <h1 className="text-4xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Kitir Digital</h1>
-        <p className="text-slate-400 font-medium">Unduh bukti pengajuan (kitir) digital untuk semua surat yang telah selesai</p>
-      </div>
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        @media print {
+          body * { visibility: hidden; }
+          #printable-kitir, #printable-kitir * { visibility: visible; }
+          #printable-kitir {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 2cm;
+          }
+          .no-print { display: none !important; }
+        }
+      `}} />
 
-      {/* Info Banner */}
-      <div className="bg-blue-50/50 dark:bg-blue-500/5 p-8 rounded-[2.5rem] border border-blue-100 dark:border-blue-500/20 flex flex-col md:flex-row items-start gap-6 transition-colors duration-300">
-        <div className="w-14 h-14 rounded-2xl bg-blue-500 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200 dark:shadow-none">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-            <circle cx="12" cy="12" r="1"/>
-          </svg>
+      <div className="space-y-8 pb-10 no-print">
+        <div className="space-y-1">
+          <h1 className="text-4xl font-black text-slate-800 tracking-tight">Unduh Kitir Digital</h1>
+          <p className="text-slate-400 font-medium">Cetak bukti pengajuan surat akademik Anda sebagai referensi</p>
         </div>
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-xl font-black text-blue-900 dark:text-blue-300">Tentang Kitir Digital</h2>
-            <p className="text-blue-800/70 dark:text-blue-400/70 text-sm font-medium leading-relaxed mt-1">
-              Kitir digital adalah bukti pengajuan surat yang dilengkapi dengan QR Code untuk verifikasi keaslian. Dokumen ini diterbitkan otomatis saat Anda mengajukan surat dan dapat digunakan sebagai bukti bahwa pengajuan Anda telah masuk ke sistem.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {['Dilengkapi QR Code', 'Dapat Diverifikasi', 'Format PDF'].map((tag) => (
-              <div key={tag} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100/50 dark:bg-blue-500/10 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {tag}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* Search Section */}
-      <div className="relative group">
-        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sipa-green transition-colors">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </div>
-        <input 
-          type="text" 
-          placeholder="Cari nomor pengajuan atau jenis surat..."
-          className="w-full pl-14 pr-8 py-5 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm focus:ring-4 focus:ring-sipa-green/10 focus:border-sipa-green outline-none font-medium text-slate-600 dark:text-slate-300 transition-all"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
-      {/* Kitir Grid */}
-      {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1,2,3].map(i => (
-            <div key={i} className="h-64 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 animate-pulse" />
-          ))}
-        </div>
-      ) : filteredHistory.length === 0 ? (
-        <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-100 dark:border-slate-800">
-           <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-200 dark:text-slate-700 mx-auto mb-6">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div className="bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-slate-100">
+           <div className="p-8 border-b border-slate-50">
+              <h2 className="text-xl font-black text-slate-800">Daftar Pengajuan Anda</h2>
            </div>
-           <p className="text-slate-400 font-bold">Tidak ada kitir digital yang ditemukan.</p>
+           <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                 <thead>
+                    <tr className="bg-slate-50/50">
+                       <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal</th>
+                       <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">No. Pengajuan</th>
+                       <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Jenis Surat</th>
+                       <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                       <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
+                    </tr>
+                 </thead>
+                 <tbody className="divide-y divide-slate-50">
+                    {loading ? (
+                       <tr><td colSpan={5} className="py-20 text-center font-bold text-slate-400">Memuat data...</td></tr>
+                    ) : pengajuan.length === 0 ? (
+                       <tr><td colSpan={5} className="py-20 text-center font-bold text-slate-400">Belum ada pengajuan</td></tr>
+                    ) : pengajuan.map((item) => (
+                       <tr key={item.id} className="hover:bg-slate-50/30 transition-all">
+                          <td className="px-8 py-6 font-medium text-slate-500 text-sm">{formatTanggal(item.created_at)}</td>
+                          <td className="px-8 py-6 font-black text-slate-800 text-sm">{item.nomor_surat}</td>
+                          <td className="px-8 py-6 font-bold text-slate-600 text-sm">{item.jenis_surat}</td>
+                          <td className="px-8 py-6">
+                            <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full font-black text-[10px] uppercase">
+                              {item.status}
+                            </span>
+                          </td>
+                          <td className="px-8 py-6 text-center">
+                             <button 
+                               onClick={() => setSelectedKitir(item)}
+                               className="px-6 py-2 bg-sipa-green text-white rounded-xl font-black text-xs hover:bg-sipa-green-dark transition-all"
+                             >
+                               Lihat Kitir
+                             </button>
+                          </td>
+                       </tr>
+                    ))}
+                 </tbody>
+              </table>
+           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredHistory.map((item) => (
-            <div 
-              key={item.id} 
-              className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 p-8 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-slate-950/50 transition-all duration-500 group relative overflow-hidden"
-            >
-              {/* Card Header */}
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-sipa-green/10 flex items-center justify-center text-sipa-green group-hover:scale-110 transition-transform duration-500 shadow-inner">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-                  </svg>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider
-                    ${item.status === 'Selesai' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400'}
-                  `}>
-                    <div className="flex items-center gap-1.5">
-                      <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'Selesai' ? 'bg-emerald-500' : 'bg-blue-500'}`} />
-                      {item.status}
-                    </div>
-                  </span>
-                </div>
-              </div>
+      </div>
 
-              {/* Card Body */}
-              <div className="space-y-4 mb-8">
-                <div>
-                  <h3 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight group-hover:text-sipa-green transition-colors">{item.nomor_surat}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1 line-clamp-1">{item.jenis_surat}</p>
-                </div>
-                
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center gap-2 text-slate-400">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">Diajukan: {formatTanggal(item.created_at)}</span>
-                  </div>
-                  {item.status === 'Selesai' && (
-                    <div className="flex items-center gap-2 text-emerald-500/70">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span className="text-[11px] font-bold uppercase tracking-wider">Selesai: {formatTanggal(item.updated_at)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Card Actions */}
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => handleDownload(item)}
-                  className="flex-1 bg-sipa-green text-white py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 dark:shadow-none active:scale-95"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                  </svg>
-                  Unduh
-                </button>
-                <Link 
-                  href={`/dashboard/pengajuan/${item.id}`}
-                  className="w-14 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center transition-all border border-slate-100 dark:border-slate-800"
-                  title="Detail Pengajuan"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                  </svg>
-                </Link>
-              </div>
-
-              {/* Hover Effect - Corner Decoration */}
-              <div className="absolute -top-12 -right-12 w-24 h-24 bg-sipa-green/5 rounded-full group-hover:scale-150 transition-transform duration-700 pointer-events-none" />
+      {/* Kitir Modal / Printable Area */}
+      {selectedKitir && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 no-print">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedKitir(null)}></div>
+          
+          <div className="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
+               <h3 className="text-xl font-black text-slate-800">Pratinjau Kitir</h3>
+               <button onClick={() => setSelectedKitir(null)} className="p-2 text-slate-400 hover:text-slate-600"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-          ))}
+            
+            <div className="p-10 overflow-y-auto">
+              {/* This is the area that will be printed */}
+              <div id="printable-kitir" className="border-2 border-slate-200 p-10 rounded-2xl bg-white text-slate-800 font-sans">
+                 <div className="text-center mb-8 border-b-2 border-slate-200 pb-8">
+                    <h1 className="text-2xl font-black uppercase tracking-widest mb-1">KITIR PENGANTAR</h1>
+                    <h2 className="text-lg font-bold text-slate-600">SISTEM PELAYANAN AKADEMIK UNESA</h2>
+                    <p className="text-sm font-medium mt-4">Tanggal Cetak: {new Date().toLocaleDateString('id-ID')}</p>
+                 </div>
+                 
+                 <div className="space-y-6">
+                    <div>
+                       <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Nomor Pengajuan</p>
+                       <p className="text-3xl font-black text-sipa-green tracking-tighter">{selectedKitir.nomor_surat}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-8">
+                       <div>
+                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Nama Mahasiswa</p>
+                          <p className="font-bold text-lg">{selectedKitir.user.nama_lengkap}</p>
+                       </div>
+                       <div>
+                          <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">NIM</p>
+                          <p className="font-bold text-lg">{selectedKitir.user.nim}</p>
+                       </div>
+                    </div>
+
+                    <div>
+                       <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Jenis Layanan</p>
+                       <p className="font-bold text-lg">{selectedKitir.jenis_surat}</p>
+                    </div>
+
+                    <div>
+                       <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Tanggal Masuk</p>
+                       <p className="font-bold text-lg">{formatTanggal(selectedKitir.created_at)}</p>
+                    </div>
+                 </div>
+
+                 <div className="mt-12 pt-8 border-t-2 border-slate-200 text-center">
+                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Peringatan</p>
+                    <p className="text-sm font-medium text-slate-600">Simpan kitir ini dengan baik. Nomor pengajuan digunakan untuk melacak status surat atau saat mengambil surat fisik di tata usaha fakultas.</p>
+                 </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-slate-100 flex justify-end gap-4">
+               <button onClick={() => setSelectedKitir(null)} className="px-8 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50">Tutup</button>
+               <button onClick={handlePrint} className="px-8 py-3 rounded-xl bg-sipa-green text-white font-black flex items-center gap-2 hover:bg-sipa-green-dark shadow-xl shadow-sipa-green/20">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                  Cetak PDF
+               </button>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -4,331 +4,520 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
-export default function VerificationPage() {
+interface User {
+  nama_lengkap: string;
+  nim: string;
+  program_studi: string;
+  email: string;
+  phone_number: string;
+}
+
+interface Pengajuan {
+  id: number;
+  id_user: string;
+  user: User;
+  nomor_surat: string;
+  jenis_surat: string;
+  keperluan: string;
+  semester: string;
+  status: string;
+  sla_status: 'Aman' | 'Mendekati' | 'Terlampaui';
+  file_url?: string;
+  komentar?: string;
+  created_at: string;
+  updated_at: string;
+  deadline_sla?: string;
+}
+
+export default function DetailPengajuanTendik() {
   const { id } = useParams();
   const router = useRouter();
-  const [surat, setSurat] = useState<any>(null);
+  const [data, setData] = useState<Pengajuan | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('KTM');
-  const [checklist, setChecklist] = useState({
-    ktm_valid: false,
-    foto_jelas: false,
-    data_sesuai: false,
-    status_aktif: false,
-    no_tunggakan: false,
-  });
-  const [revisionNote, setRevisionNote] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
+  const [catatan, setCatatan] = useState('');
+  const [updating, setUpdating] = useState(false);
+
+  const getParsedDocs = (fileUrlString?: string) => {
+    if (!fileUrlString) return {};
+    try {
+      return JSON.parse(fileUrlString);
+    } catch (e) {
+      return { "Lampiran Dokumen": fileUrlString };
+    }
+  };
+
+  const handleDownloadAll = () => {
+    if (!data?.file_url) return;
+    try {
+      const docs = JSON.parse(data.file_url);
+      Object.entries(docs).forEach(([name, url]) => {
+        const a = document.createElement('a');
+        a.href = url as string;
+        a.target = '_blank';
+        a.download = name;
+        a.click();
+      });
+    } catch (e) {
+      window.open(data.file_url, '_blank');
+    }
+  };
+
+  const handleSendEmail = () => {
+    if (!data) return;
+    const subject = encodeURIComponent(`Informasi Pengajuan Surat ${data.nomor_surat}`);
+    const body = encodeURIComponent(`Halo ${data.user.nama_lengkap},\n\nTerkait pengajuan surat Anda (${data.jenis_surat}) dengan nomor ${data.nomor_surat}.\n\nSalam,\nStaf Layanan Akademik`);
+    window.location.href = `mailto:${data.user.email}?subject=${subject}&body=${body}`;
+  };
+
+  const fetchDetail = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('sipa_token');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const result = await res.json();
+        setData(result.data);
+        setNewStatus(result.data.status);
+        setCatatan(result.data.komentar || '');
+      }
+    } catch (err) {
+      console.error('Gagal mengambil detail:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDetail = async () => {
-      try {
-        const token = localStorage.getItem('sipa_token');
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setSurat(data.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     if (id) fetchDetail();
   }, [id]);
 
-  const allChecked = Object.values(checklist).every(v => v === true);
-
-  const handleCheck = (key: keyof typeof checklist) => {
-    setChecklist(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const updateStatus = async (newStatus: string) => {
-    if (newStatus === 'Diterima Tendik' && !allChecked) return;
-    if (newStatus === 'Ditolak' && !revisionNote) {
-      alert('Mohon isi catatan revisi jika ingin menolak pengajuan.');
+  const handleUpdateStatus = async () => {
+    if (newStatus === 'Ditolak' && !catatan.trim()) {
+      alert('Alasan penolakan wajib diisi!');
       return;
     }
 
-    setIsVerifying(true);
+    setUpdating(true);
     try {
       const token = localStorage.getItem('sipa_token');
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat/${id}/status`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          status: newStatus,
-          catatan: revisionNote || 'Dokumen telah diverifikasi dan valid.'
-        })
+        body: JSON.stringify({ status: newStatus, catatan: catatan })
       });
 
       if (res.ok) {
-        alert(`Pengajuan berhasil ${newStatus === 'Ditolak' ? 'ditolak' : 'diverifikasi'}!`);
-        router.push('/dashboard/tendik');
+        setShowUpdateModal(false);
+        fetchDetail();
       } else {
-        const err = await res.json();
-        alert(err.error || 'Gagal memperbarui status');
+        const errData = await res.json();
+        alert(errData.error || 'Gagal memperbarui status');
       }
-    } catch (error) {
-      console.error(error);
-      alert('Terjadi kesalahan koneksi');
+    } catch (err) {
+      console.error('Update status error:', err);
     } finally {
-      setIsVerifying(false);
+      setUpdating(false);
     }
   };
 
-  const tabs = [
-    { id: 'KTM', name: 'Kartu Tanda Mahasiswa' },
-    { id: 'TRANSKRIP', name: 'Transkrip Nilai' },
-    { id: 'KRS', name: 'Kartu Rencana Studi' },
-    { id: 'KTM_BACK', name: 'KTM (Belakang)' },
-  ];
+  const formatTanggalFull = (dateStr: string) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) + " WIB";
+  };
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-        <p className="text-slate-400 font-bold animate-pulse uppercase text-xs tracking-widest">Memuat Data Pengajuan...</p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Memuat Detail Pengajuan...</p>
       </div>
     );
   }
 
-  if (!surat) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-2">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <h2 className="text-xl font-black text-slate-800">Pengajuan Tidak Ditemukan</h2>
-        <Link href="/dashboard/tendik" className="text-emerald-600 font-bold hover:underline">Kembali ke Dashboard</Link>
-      </div>
-    );
-  }
+  if (!data) return <div className="text-center py-20 font-bold">Data tidak ditemukan</div>;
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header Area */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-        <div>
-          <Link 
-            href="/dashboard/tendik" 
-            className="inline-flex items-center gap-2 text-emerald-600 font-bold text-xs mb-4 group"
-          >
-            <div className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    <>
+      {/* Print-Only Style Tag */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @media print {
+          body {
+            background-color: white !important;
+            color: black !important;
+          }
+          /* Hide all standard screen layout elements */
+          aside, nav, header, button, a, footer, .no-print, .shadow-xl, .border-slate-100 {
+            display: none !important;
+            box-shadow: none !important;
+          }
+          /* Hide main container completely so we ONLY render the dedicated print document */
+          .space-y-6 > *:not(#print-document) {
+            display: none !important;
+          }
+          #print-document {
+            display: block !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            background: white !important;
+            color: black !important;
+            padding: 20px !important;
+          }
+        }
+      `}} />
+
+      {/* Official Printed Receipt / Bukti Pengajuan (Clean academic layout) */}
+      <div id="print-document" className="hidden font-serif p-8 text-black bg-white max-w-3xl mx-auto border-2 border-slate-200">
+         {/* Kop Surat / Academic Letterhead */}
+         <div className="text-center border-b-4 border-double border-black pb-4 mb-6">
+            <h2 className="text-xl font-bold tracking-wide uppercase">UNIVERSITAS NEGERI SURABAYA</h2>
+            <h3 className="text-md font-bold uppercase tracking-widest mt-1">FAKULTAS TEKNIK</h3>
+            <p className="text-xs italic font-sans text-slate-500 mt-1">Sistem Informasi Pelayanan Akademik Berbasis Workflow & SLA (SIPA)</p>
+         </div>
+
+         {/* Title */}
+         <div className="text-center mb-8">
+            <h4 className="text-lg font-bold uppercase underline tracking-tight">KAPITIR DIGITAL - BUKTI PENGAJUAN SURAT</h4>
+            <p className="text-xs font-sans font-bold text-slate-500 mt-1">Nomor Pengajuan: {data.nomor_surat}</p>
+         </div>
+
+         {/* Meta details */}
+         <div className="grid grid-cols-2 gap-4 text-xs font-sans mb-6 border-b border-dashed pb-4">
+            <div>
+               <p><span className="font-bold">Jenis Surat:</span> {data.jenis_surat}</p>
+               <p><span className="font-bold">Status Saat Ini:</span> {data.status}</p>
             </div>
-            Kembali ke Dashboard
-          </Link>
-          <h1 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Workspace Verifikasi Berkas</h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium text-sm mt-1">Tinjau dan verifikasi dokumen persyaratan pengajuan surat</p>
-        </div>
-        
-        <div className="px-5 py-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">ID Pengajuan</p>
-          <p className="text-sm font-black text-emerald-600">#{surat.nomor_surat}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-        {/* Left: Document Viewer */}
-        <div className="xl:col-span-8 flex flex-col gap-4">
-          {/* Tabs */}
-          <div className="flex gap-2 p-1.5 bg-slate-900 rounded-2xl overflow-x-auto no-scrollbar">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all
-                  ${activeTab === tab.id 
-                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-              >
-                {tab.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Viewer Area */}
-          <div className="relative aspect-[4/3] bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-800 flex flex-col shadow-2xl">
-            <div className="flex-1 flex items-center justify-center p-8">
-              {/* Document Display based on active tab */}
-              <div className="w-full max-w-2xl bg-white rounded-lg shadow-2xl p-8 animate-in fade-in zoom-in duration-500 overflow-hidden">
-                {surat.file_url ? (
-                   <img 
-                    src={surat.file_url} 
-                    alt={activeTab} 
-                    className="w-full h-auto object-contain"
-                   />
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-20 text-slate-300 gap-4">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                    <p className="font-bold uppercase tracking-widest text-xs">Dokumen Tidak Tersedia</p>
-                  </div>
-                )}
-              </div>
+            <div className="text-right">
+               <p><span className="font-bold">Tanggal Pengajuan:</span> {formatTanggalFull(data.created_at)}</p>
+               <p><span className="font-bold">Estimasi SLA:</span> 3 Hari Kerja</p>
             </div>
+         </div>
 
-            {/* Viewer Controls */}
-            <div className="p-4 bg-slate-900/80 backdrop-blur-md border-t border-slate-800 flex justify-center items-center gap-6">
-              <button className="text-slate-400 hover:text-white transition-colors p-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-              </button>
-              <span className="text-xs font-black text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">100%</span>
-              <button className="text-slate-400 hover:text-white transition-colors p-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-              </button>
-              <div className="h-6 w-px bg-slate-800 mx-2"></div>
-              <div className="flex items-center gap-4">
-                <button className="text-slate-400 hover:text-white disabled:opacity-30 p-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
-                <span className="text-xs font-bold text-slate-300">1 / 1</span>
-                <button className="text-slate-400 hover:text-white disabled:opacity-30 p-2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
-              </div>
+         {/* Data Pemohon */}
+         <div className="mb-6">
+            <h5 className="text-xs font-sans font-bold uppercase tracking-widest bg-slate-100 p-2 mb-3">I. DATA MAHASISWA (PEMOHON)</h5>
+            <table className="w-full text-xs font-sans text-left border-collapse">
+               <tbody>
+                  <tr className="border-b"><td className="py-2 font-bold w-1/3">Nama Lengkap</td><td className="py-2">{data.user.nama_lengkap}</td></tr>
+                  <tr className="border-b"><td className="py-2 font-bold">Nomor Induk Mahasiswa (NIM)</td><td className="py-2">{data.user.nim}</td></tr>
+                  <tr className="border-b"><td className="py-2 font-bold">Program Studi</td><td className="py-2">{data.user.program_studi}</td></tr>
+                  <tr className="border-b"><td className="py-2 font-bold">Email & Telepon</td><td className="py-2">{data.user.email} / {data.user.phone_number || '-'}</td></tr>
+                  <tr className="border-b"><td className="py-2 font-bold">Semester / Kelas</td><td className="py-2">Semester {data.semester}</td></tr>
+               </tbody>
+            </table>
+         </div>
+
+         {/* Detail Pengajuan */}
+         <div className="mb-8">
+            <h5 className="text-xs font-sans font-bold uppercase tracking-widest bg-slate-100 p-2 mb-3">II. DETAIL PERMOHONAN</h5>
+            <div className="text-xs font-serif leading-relaxed border p-4 bg-slate-50/50 min-h-[80px]">
+               <p className="font-sans font-bold text-[10px] text-slate-400 uppercase mb-1">Tujuan / Keperluan Penggunaan:</p>
+               {data.keperluan}
             </div>
-          </div>
-        </div>
-
-        {/* Right: Data & Verification */}
-        <div className="xl:col-span-4 space-y-6">
-          {/* Info Card */}
-          <div className="bg-emerald-50 dark:bg-emerald-500/5 rounded-[2.5rem] p-8 border border-emerald-100 dark:border-emerald-500/10">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              </div>
-              <div>
-                <h3 className="font-black text-slate-800 dark:text-white text-sm">Verifikasi Mahasiswa</h3>
-                <p className="text-xs font-bold text-emerald-600">{surat.jenis_surat}</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-white/60 dark:bg-slate-900/40 rounded-2xl p-4 border border-white dark:border-slate-800">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  </div>
-                  <h4 className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Identitas Pemohon</h4>
-                </div>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Lengkap</p>
-                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{surat.user?.nama_lengkap || '-'}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">NIM</p>
-                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{surat.user?.nim || '-'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Semester</p>
-                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{surat.semester || '-'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Checklist */}
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              </div>
-              <h3 className="font-black text-slate-800 dark:text-white uppercase text-xs tracking-[0.2em]">Checklist Persyaratan</h3>
-            </div>
-
-            <div className="space-y-3 mb-8">
-              {[
-                { key: 'ktm_valid', label: 'KTM masih berlaku' },
-                { key: 'foto_jelas', label: 'Foto pada KTM jelas dan sesuai' },
-                { key: 'data_sesuai', label: 'Data mahasiswa sesuai dengan sistem' },
-                { key: 'status_aktif', label: 'Status mahasiswa aktif' },
-                { key: 'no_tunggakan', label: 'Tidak ada tunggakan administrasi' },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  onClick={() => handleCheck(item.key as any)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left
-                    ${checklist[item.key as keyof typeof checklist]
-                      ? 'bg-emerald-50/50 border-emerald-500/20 text-emerald-700 dark:bg-emerald-500/5' 
-                      : 'bg-slate-50 border-transparent text-slate-500 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
-                >
-                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all
-                    ${checklist[item.key as keyof typeof checklist]
-                      ? 'bg-emerald-500 border-emerald-500 text-white' 
-                      : 'border-slate-300 dark:border-slate-700'
-                    }`}
-                  >
-                    {checklist[item.key as keyof typeof checklist] && (
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    )}
-                  </div>
-                  <span className="text-sm font-bold tracking-tight">{item.label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Revision Note */}
-            <div className="space-y-2 mb-8">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Catatan Revisi (Opsional)</label>
-              <textarea
-                placeholder="Tuliskan catatan jika ada dokumen yang perlu diperbaiki..."
-                className="w-full h-32 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-transparent focus:bg-white dark:focus:bg-slate-950 focus:border-emerald-500/20 outline-none transition-all font-medium text-slate-600 dark:text-slate-300 text-sm resize-none"
-                value={revisionNote}
-                onChange={(e) => setRevisionNote(e.target.value)}
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-3">
-              <button
-                onClick={() => updateStatus('Diproses')}
-                disabled={!allChecked || isVerifying}
-                className={`w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-black text-sm transition-all
-                  ${allChecked 
-                    ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 active:scale-[0.98]' 
-                    : 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800'
-                  }`}
-              >
-                {isVerifying ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    Verifikasi & Proses
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => updateStatus('Ditolak')}
-                disabled={isVerifying}
-                className="w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-black text-sm text-red-500 border-2 border-red-100 dark:border-red-500/20 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all active:scale-[0.98]"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                Tolak Pengajuan
-              </button>
-            </div>
-
-            {!allChecked && (
-              <div className="mt-6 flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-500/5 rounded-2xl border border-amber-100 dark:border-amber-500/10">
-                <div className="text-amber-500">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                </div>
-                <p className="text-[10px] font-black text-amber-600 uppercase tracking-wider">Harap centang semua checklist sebelum memverifikasi</p>
-              </div>
+            {data.komentar && (
+               <div className="text-xs font-serif leading-relaxed border border-t-0 p-4 bg-slate-50/50">
+                  <p className="font-sans font-bold text-[10px] text-slate-400 uppercase mb-1">Catatan Pemrosesan:</p>
+                  {data.komentar}
+               </div>
             )}
+         </div>
+
+         {/* QR verification and stamp */}
+         <div className="mt-12 flex justify-between items-start border-t border-dashed pt-6 text-xs font-sans">
+            <div className="flex gap-4 items-center">
+               <div className="w-20 h-20 bg-slate-100 border-2 border-slate-300 flex items-center justify-center font-bold text-[8px] text-slate-400 text-center uppercase p-1">
+                  QR CODE VERIFIKASI DIGITAL
+               </div>
+               <div>
+                  <p className="font-bold text-slate-700">Telah Diverifikasi Secara Digital</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">Sistem SIPA Universitas Negeri Surabaya</p>
+                  <p className="text-[10px] text-slate-400">Bukti ini sah dikeluarkan oleh fakultas secara elektronik.</p>
+               </div>
+            </div>
+            <div className="text-center w-1/3">
+               <p className="text-slate-400 mb-10">Surabaya, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+               <p className="font-bold text-slate-700 underline">Sistem Layanan Akademik</p>
+               <p className="text-[10px] text-slate-400">Universitas Negeri Surabaya</p>
+            </div>
+         </div>
+      </div>
+
+      <div className="space-y-6 pb-10 no-print">
+      {/* Top Bar */}
+      <div className="flex justify-between items-center">
+        <Link 
+          href="/dashboard/tendik" 
+          className="inline-flex items-center gap-2 text-slate-400 font-bold hover:text-emerald-600 transition-all group"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Kembali
+        </Link>
+        <button 
+          onClick={() => setShowUpdateModal(true)}
+          className="bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-black text-sm shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all"
+        >
+          Update Status
+        </button>
+      </div>
+
+      {/* Main Header Card */}
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-800 tracking-tight">Nomor Pengajuan: {data.nomor_surat}</h1>
+          <p className="text-slate-500 font-medium text-lg mt-1">Jenis Surat: {data.jenis_surat}</p>
+          <div className="flex items-center gap-2 mt-4">
+             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider
+                ${data.status === 'Selesai' ? 'bg-emerald-50 text-emerald-600' : 
+                  data.status === 'Diajukan' ? 'bg-blue-50 text-blue-600' : 
+                  data.status === 'Diterima Tendik' ? 'bg-purple-50 text-purple-600' : 
+                  data.status === 'Diproses' ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600'}
+             `}>
+               {data.status}
+             </span>
+             <span className="text-[10px] text-slate-400 font-bold">Terakhir diperbarui: {formatTanggalFull(data.updated_at)}</span>
+          </div>
+        </div>
+        <div className={`px-5 py-3 rounded-2xl border-2 flex items-center gap-3 font-black text-sm
+          ${data.sla_status === 'Terlampaui' ? 'border-red-100 bg-red-50 text-red-600' : 
+            data.sla_status === 'Mendekati' ? 'border-amber-100 bg-amber-50 text-amber-600' : 'border-emerald-100 bg-emerald-50 text-emerald-600'}
+        `}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <div>
+             <p className="text-[10px] uppercase leading-none mb-0.5">Status SLA</p>
+             <p className="text-base leading-none">12 jam</p>
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Col: Details */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Data Pemohon */}
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+             <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </div>
+                <h2 className="text-xl font-black text-slate-800">Data Pemohon</h2>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nama Lengkap</p>
+                   <p className="text-slate-800 font-bold">{data.user.nama_lengkap}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">NIM</p>
+                   <p className="text-slate-800 font-bold">{data.user.nim}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Program Studi</p>
+                   <p className="text-slate-800 font-bold">{data.user.program_studi}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</p>
+                   <p className="text-slate-800 font-bold">{data.user.email}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No. Telepon</p>
+                   <p className="text-slate-800 font-bold">{data.user.phone_number || '-'}</p>
+                </div>
+             </div>
+          </div>
+
+          {/* Detail Pengajuan */}
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+             <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <h2 className="text-xl font-black text-slate-800">Detail Pengajuan</h2>
+             </div>
+             <div className="space-y-8">
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tujuan Penggunaan</p>
+                   <p className="text-slate-800 font-bold">{data.keperluan}</p>
+                </div>
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Keterangan Tambahan</p>
+                   <p className="text-slate-600 font-medium leading-relaxed">{data.komentar || 'Tidak ada keterangan tambahan'}</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                   <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Diajukan</p>
+                      <p className="text-slate-800 font-bold">{formatTanggalFull(data.created_at)}</p>
+                   </div>
+                   <div className="space-y-1">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Dibutuhkan</p>
+                      <p className="text-slate-800 font-bold">10 April 2024</p>
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          {/* Timeline */}
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+             <h2 className="text-xl font-black text-slate-800 mb-8">Timeline Proses</h2>
+             <div className="space-y-8 relative pl-10">
+                <div className="absolute left-4 top-1 bottom-1 w-0.5 bg-slate-100"></div>
+                
+                <div className="relative">
+                   <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-emerald-500 border-4 border-white shadow-lg flex items-center justify-center text-white">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                   </div>
+                   <h3 className="font-black text-slate-800">Diajukan</h3>
+                   <p className="text-[10px] text-slate-400 font-bold uppercase">{formatTanggalFull(data.created_at)}</p>
+                   <p className="text-xs font-medium text-slate-500 mt-1">oleh {data.user.nama_lengkap}</p>
+                </div>
+
+                {data.updated_at !== data.created_at && (
+                  <div className="relative">
+                    <div className="absolute -left-10 top-0 w-8 h-8 rounded-full bg-blue-500 border-4 border-white shadow-lg flex items-center justify-center text-white">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <h3 className="font-black text-slate-800">{data.status}</h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{formatTanggalFull(data.updated_at)}</p>
+                    <p className="text-xs font-medium text-slate-500 mt-1">oleh Staf Tata Usaha</p>
+                  </div>
+                )}
+             </div>
+          </div>
+        </div>
+
+        {/* Right Col: Sidebar */}
+        <div className="space-y-6">
+          {/* Dokumen Pendukung */}
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+             <h2 className="text-lg font-black text-slate-800 mb-6">Dokumen Pendukung</h2>
+             <div className="space-y-3">
+                {data.file_url && Object.keys(getParsedDocs(data.file_url)).length > 0 ? (
+                   Object.entries(getParsedDocs(data.file_url)).map(([name, url]) => (
+                     <a 
+                       key={name}
+                       href={url as string} 
+                       target="_blank" 
+                       rel="noopener noreferrer" 
+                       className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-100 group hover:bg-white hover:border-emerald-200 transition-all cursor-pointer"
+                     >
+                        <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-500 flex items-center justify-center">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                           </div>
+                           <div>
+                              <p className="text-sm font-bold text-slate-700">{name}</p>
+                              <p className="text-[10px] font-medium text-slate-400">Tersedia</p>
+                           </div>
+                        </div>
+                        <svg className="text-slate-300 group-hover:text-emerald-500 transition-colors" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                     </a>
+                   ))
+                ) : (
+                   <p className="text-sm text-slate-400 font-medium text-center py-4">Tidak ada dokumen pendukung</p>
+                )}
+             </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-emerald-50/50 p-8 rounded-[2.5rem] border border-emerald-100 space-y-4">
+             <h2 className="text-lg font-black text-slate-800 mb-4">Quick Actions</h2>
+             <button onClick={handleDownloadAll} className="w-full py-3 px-4 rounded-xl bg-white border border-emerald-200 text-emerald-700 text-xs font-black hover:bg-emerald-600 hover:text-white transition-all">Download Semua Dokumen</button>
+             <button onClick={() => window.print()} className="w-full py-3 px-4 rounded-xl bg-white border border-emerald-200 text-emerald-700 text-xs font-black hover:bg-emerald-600 hover:text-white transition-all">Cetak Detail Pengajuan</button>
+             <button onClick={handleSendEmail} className="w-full py-3 px-4 rounded-xl bg-white border border-emerald-200 text-emerald-700 text-xs font-black hover:bg-emerald-600 hover:text-white transition-all">Kirim Email ke Pemohon</button>
+          </div>
+
+          {/* Informasi SLA */}
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 space-y-4">
+             <h2 className="text-lg font-black text-slate-800 mb-4">Informasi SLA</h2>
+             <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                   <span className="text-sm font-medium text-slate-400">Target Penyelesaian:</span>
+                   <span className="text-sm font-bold text-slate-800">3 hari kerja</span>
+                </div>
+                <div className="flex justify-between items-center">
+                   <span className="text-sm font-medium text-slate-400">Sisa Waktu:</span>
+                   <span className="text-sm font-bold text-amber-600">12 jam</span>
+                </div>
+                <div className="flex justify-between items-center">
+                   <span className="text-sm font-medium text-slate-400">Status SLA:</span>
+                   <span className="text-[10px] font-black uppercase text-amber-600 bg-amber-50 px-3 py-1 rounded-full">Peringatan</span>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- UPDATE STATUS MODAL --- */}
+      {showUpdateModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => !updating && setShowUpdateModal(false)}></div>
+          <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl border border-slate-100">
+             <h2 className="text-2xl font-black text-slate-800 mb-6">Update Status Pengajuan</h2>
+             
+             <div className="space-y-6">
+                <div className="space-y-2">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Status Baru</label>
+                   <select 
+                      className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-emerald-500/20 font-bold text-slate-700 cursor-pointer"
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                   >
+                      <option value="Diajukan">Diajukan</option>
+                      <option value="Diterima Tendik">Diterima Tendik</option>
+                      <option value="Diproses">Diproses</option>
+                      <option value="Selesai">Selesai</option>
+                      <option value="Ditolak">Ditolak</option>
+                   </select>
+                </div>
+
+                <div className="space-y-2">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Catatan / Alasan (Wajib jika ditolak)</label>
+                   <textarea 
+                      className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-none focus:ring-2 focus:ring-emerald-500/20 font-medium text-slate-700 min-h-[120px]"
+                      placeholder="Masukkan catatan pemrosesan..."
+                      value={catatan}
+                      onChange={(e) => setCatatan(e.target.value)}
+                   ></textarea>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                   <button 
+                      onClick={() => setShowUpdateModal(false)}
+                      disabled={updating}
+                      className="flex-1 py-4 rounded-2xl bg-slate-100 text-slate-500 font-black text-sm hover:bg-slate-200 transition-all"
+                   >
+                      Batal
+                   </button>
+                   <button 
+                      onClick={handleUpdateStatus}
+                      disabled={updating}
+                      className="flex-1 py-4 rounded-2xl bg-emerald-600 text-white font-black text-sm shadow-xl shadow-emerald-200 hover:bg-emerald-700 transition-all flex items-center justify-center gap-2"
+                   >
+                      {updating && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                      SIMPAN PERUBAHAN
+                   </button>
+                </div>
+             </div>
+          </div>
+        </div>
+      )}
     </div>
+    </>
   );
 }

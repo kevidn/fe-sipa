@@ -4,71 +4,17 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-const letterTypes = [
-  {
-    id: 'kuliah',
-    title: 'Surat Keterangan Masih Kuliah',
-    estimation: 'Estimasi: 1-2 hari kerja',
-    icon: (selected: boolean) => (
-      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
-        {selected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-      </div>
-    )
-  },
-  {
-    id: 'skripsi',
-    title: 'Surat Ijin Survei Penelitian (Skripsi)',
-    estimation: 'Estimasi: 3-5 hari kerja',
-    icon: (selected: boolean) => (
-      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
-        {selected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-      </div>
-    )
-  },
-  {
-    id: 'tunjangan',
-    title: 'Surat Tunjangan/Pensiun/Akses',
-    estimation: 'Estimasi: 2-3 hari kerja',
-    icon: (selected: boolean) => (
-      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
-        {selected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-      </div>
-    )
-  },
-  {
-    id: 'beasiswa-tidak',
-    title: 'Surat Keterangan Tidak Menerima Beasiswa',
-    estimation: 'Estimasi: 1-2 hari kerja',
-    icon: (selected: boolean) => (
-      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
-        {selected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-      </div>
-    )
-  },
-  {
-    id: 'beasiswa-rek',
-    title: 'Surat Rekomendasi Beasiswa',
-    estimation: 'Estimasi: 3-5 hari kerja',
-    icon: (selected: boolean) => (
-      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
-        {selected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-      </div>
-    )
-  },
-  {
-    id: 'skck',
-    title: 'Surat Keterangan Kelakuan Baik',
-    estimation: 'Estimasi: 1-2 hari kerja',
-    icon: (selected: boolean) => (
-      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selected ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
-        {selected && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
-      </div>
-    )
-  }
-];
+interface JenisSurat {
+  id: number;
+  nama: string;
+  sla_hari: number;
+  persyaratan: string;
+  is_active: boolean;
+}
 
 export default function AjukanSuratBaru() {
   const router = useRouter();
+  const [letterTypes, setLetterTypes] = useState<JenisSurat[]>([]);
   const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -77,19 +23,74 @@ export default function AjukanSuratBaru() {
   // Form State
   const [semester, setSemester] = useState('');
   const [keperluan, setKeperluan] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | null }>({});
+
+  const getRequirements = (letterName: string, backendPersyaratan?: string): string[] => {
+    if (backendPersyaratan && backendPersyaratan.trim()) {
+      return backendPersyaratan.split(',').map(s => s.trim());
+    }
+    switch (letterName) {
+      case 'Surat Keterangan Masih Kuliah':
+        return ['Kartu Tanda Mahasiswa', 'Kartu Rencana Studi'];
+      case 'Surat Ijin Survei Penelitian (Skripsi)':
+        return ['Kartu Tanda Mahasiswa', 'Transkrip Nilai'];
+      case 'Surat Tunjangan/Pensiun/Akses':
+        return ['Kartu Tanda Mahasiswa', 'Kartu Rencana Studi'];
+      case 'Surat Keterangan Tidak Menerima Beasiswa':
+        return ['Kartu Tanda Mahasiswa', 'Transkrip Nilai'];
+      case 'Surat Rekomendasi Beasiswa':
+        return ['Kartu Tanda Mahasiswa', 'Kartu Rencana Studi', 'Transkrip Nilai'];
+      case 'Surat Keterangan Kelakuan Baik':
+        return ['Kartu Tanda Mahasiswa', 'Transkrip Nilai'];
+      default:
+        return ['Kartu Tanda Mahasiswa'];
+    }
+  };
+
+  const requirements = getRequirements(selectedLetter || '', letterTypes.find(l => l.nama === selectedLetter)?.persyaratan);
 
   useEffect(() => {
     const userDataStr = localStorage.getItem('sipa_user');
     if (userDataStr) {
       setUser(JSON.parse(userDataStr));
     }
+    
+    // Fetch Jenis Surat (FR032)
+    const fetchJenisSurat = async () => {
+      const fallbackJenisSurat: JenisSurat[] = [
+        { id: 1, nama: 'Surat Keterangan Masih Kuliah', sla_hari: 3, persyaratan: 'Kartu Tanda Mahasiswa, Kartu Rencana Studi', is_active: true },
+        { id: 2, nama: 'Surat Ijin Survei Penelitian (Skripsi)', sla_hari: 5, persyaratan: 'Kartu Tanda Mahasiswa, Transkrip Nilai', is_active: true },
+        { id: 3, nama: 'Surat Tunjangan/Pensiun/Akses', sla_hari: 3, persyaratan: 'Kartu Tanda Mahasiswa, Kartu Rencana Studi', is_active: true },
+        { id: 4, nama: 'Surat Keterangan Tidak Menerima Beasiswa', sla_hari: 3, persyaratan: 'Kartu Tanda Mahasiswa, Transkrip Nilai', is_active: true },
+        { id: 5, nama: 'Surat Rekomendasi Beasiswa', sla_hari: 3, persyaratan: 'Kartu Tanda Mahasiswa, Kartu Rencana Studi, Transkrip Nilai', is_active: true },
+        { id: 6, nama: 'Surat Keterangan Kelakuan Baik', sla_hari: 3, persyaratan: 'Kartu Tanda Mahasiswa, Transkrip Nilai', is_active: true }
+      ];
+
+      try {
+        const token = localStorage.getItem('sipa_token');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jenis-surat`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const list = (data.data || []).filter((item: JenisSurat) => item.is_active);
+          setLetterTypes(list.length > 0 ? list : fallbackJenisSurat);
+        } else {
+          setLetterTypes(fallbackJenisSurat);
+        }
+      } catch (error) {
+        console.error('Failed to fetch jenis surat', error);
+        setLetterTypes(fallbackJenisSurat);
+      }
+    };
+    fetchJenisSurat();
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
+  const handleFileChange = (requirement: string, file: File | null) => {
+    setUploadedFiles(prev => ({
+      ...prev,
+      [requirement]: file
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,17 +100,47 @@ export default function AjukanSuratBaru() {
       return;
     }
 
+    const missingFiles = requirements.filter(req => !uploadedFiles[req]);
+    if (missingFiles.length > 0) {
+      setShowModal({ show: true, type: 'error', message: `Mohon unggah semua dokumen persyaratan: ${missingFiles.join(', ')}.` });
+      return;
+    }
+
     setLoading(true);
 
     try {
       const token = localStorage.getItem('sipa_token');
-      const letterTypeTitle = letterTypes.find(t => t.id === selectedLetter)?.title || selectedLetter;
+      const uploadedUrls: { [key: string]: string } = {};
+
+      for (const req of requirements) {
+        const fileToUpload = uploadedFiles[req];
+        if (fileToUpload) {
+          const formData = new FormData();
+          formData.append('file', fileToUpload);
+          
+          const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+
+          if (!uploadRes.ok) {
+            const errData = await uploadRes.json();
+            throw new Error(errData.error || `Gagal mengunggah berkas ${req}.`);
+          }
+
+          const uploadData = await uploadRes.json();
+          uploadedUrls[req] = uploadData.data.file_url;
+        }
+      }
 
       const payload = {
-        jenis_surat: letterTypeTitle,
+        jenis_surat: selectedLetter,
         keperluan: keperluan,
         semester: semester,
-        file_url: file ? file.name : '' 
+        file_url: JSON.stringify(uploadedUrls)
       };
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat`, {
@@ -147,8 +178,8 @@ export default function AjukanSuratBaru() {
     <div className="space-y-8 pb-20">
       {/* Success/Error Modal Popup */}
       {showModal.show && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={closeModal}></div>
+        <div className="fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center p-6">
+          <div className="fixed inset-0 w-screen h-screen bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" onClick={closeModal}></div>
           <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 max-w-md w-full shadow-2xl animate-in zoom-in-95 slide-in-from-bottom-10 duration-500 text-center border border-slate-100 dark:border-slate-800">
             <div className={`w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 ${showModal.type === 'success' ? 'bg-green-100 dark:bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400'}`}>
               {showModal.type === 'success' ? (
@@ -203,22 +234,25 @@ export default function AjukanSuratBaru() {
             {letterTypes.map((type) => (
               <button
                 key={type.id}
-                onClick={() => setSelectedLetter(type.id)}
+                type="button"
+                onClick={() => setSelectedLetter(type.nama)}
                 className={`flex items-start gap-5 p-6 rounded-3xl border-2 text-left transition-all duration-300 group
-                  ${selectedLetter === type.id 
+                  ${selectedLetter === type.nama 
                     ? 'border-sipa-green bg-sipa-green/[0.03] dark:bg-sipa-green/5 shadow-lg shadow-sipa-green/[0.05]' 
                     : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                   }`}
               >
                 <div className="mt-1 flex-shrink-0">
-                  {type.icon(selectedLetter === type.id)}
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedLetter === type.nama ? 'border-sipa-green bg-sipa-green' : 'border-slate-300'}`}>
+                    {selectedLetter === type.nama && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                  </div>
                 </div>
                 <div>
-                  <h3 className={`font-bold transition-colors ${selectedLetter === type.id ? 'text-sipa-green' : 'text-slate-800 dark:text-slate-200'}`}>
-                    {type.title}
+                  <h3 className={`font-bold transition-colors ${selectedLetter === type.nama ? 'text-sipa-green' : 'text-slate-800 dark:text-slate-200'}`}>
+                    {type.nama}
                   </h3>
                   <p className="text-xs text-slate-400 font-bold mt-1.5 uppercase tracking-wide">
-                    {type.estimation}
+                    Estimasi: {(type as any).sla || `${type.sla_hari} hari kerja`}
                   </p>
                 </div>
               </button>
@@ -283,23 +317,33 @@ export default function AjukanSuratBaru() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-2">Dokumen Pendukung (opsional)</label>
-                <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] p-10 flex flex-col items-center justify-center gap-4 hover:border-sipa-green/50 hover:bg-sipa-green/[0.02] dark:hover:bg-sipa-green/5 transition-all cursor-pointer relative group">
-                  <input 
-                    type="file" 
-                    onChange={handleFileChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                  />
-                  <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-sipa-green transition-colors">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-bold text-slate-600 dark:text-slate-300">{file ? file.name : 'Klik untuk upload file'}</p>
-                    <p className="text-xs text-slate-400 font-medium mt-1">PDF, JPG, PNG (Max 5MB)</p>
-                  </div>
+              <div className="space-y-6">
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest px-2 block">Dokumen Pendukung Wajib</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {requirements.map((req) => (
+                    <div key={req} className="flex flex-col gap-2">
+                      <span className="text-xs font-black text-slate-500 dark:text-slate-400 px-1">{req} <span className="text-red-500">*</span></span>
+                      <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] p-6 flex flex-col items-center justify-center gap-2 hover:border-sipa-green/50 hover:bg-sipa-green/[0.01] dark:hover:bg-sipa-green/5 transition-all cursor-pointer relative group">
+                        <input 
+                          type="file" 
+                          onChange={(e) => handleFileChange(req, e.target.files && e.target.files[0] ? e.target.files[0] : null)}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                          required
+                        />
+                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-sipa-green transition-colors">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                          </svg>
+                        </div>
+                        <div className="text-center">
+                          <p className="font-bold text-xs text-slate-600 dark:text-slate-300">
+                            {uploadedFiles[req] ? (uploadedFiles[req] as File).name : `Klik untuk upload ${req}`}
+                          </p>
+                          <p className="text-[10px] text-slate-400 font-medium mt-0.5">PDF, JPG, PNG, DOC, DOCX (Max 5MB)</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
