@@ -265,11 +265,11 @@ export default function ManajemenJenisSurat() {
       {(showModal === 'add' || showModal === 'edit') && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowModal(null)}></div>
-           <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl transition-colors">
-              <div className="bg-emerald-600 px-10 py-6 text-white">
+           <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg max-h-[90vh] flex flex-col rounded-[2.5rem] overflow-hidden shadow-2xl transition-colors">
+              <div className="bg-emerald-600 px-6 sm:px-10 py-5 sm:py-6 text-white shrink-0">
                  <h2 className="text-xl font-black tracking-tight">{showModal === 'add' ? 'Tambah Jenis Surat Baru' : 'Edit Jenis Surat'}</h2>
               </div>
-              <div className="p-10 space-y-6">
+              <div className="p-6 sm:p-10 space-y-5 sm:space-y-6 overflow-y-auto">
                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kode Surat *</label>
                     <input 
@@ -354,11 +354,11 @@ export default function ManajemenJenisSurat() {
       {showModal === 'view' && selected && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowModal(null)}></div>
-           <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg rounded-[2.5rem] overflow-hidden shadow-2xl transition-colors">
-              <div className="bg-emerald-600 px-10 py-6 text-white">
+           <div className="relative bg-white dark:bg-slate-900 w-full max-w-lg max-h-[90vh] flex flex-col rounded-[2.5rem] overflow-hidden shadow-2xl transition-colors">
+              <div className="bg-emerald-600 px-6 sm:px-10 py-5 sm:py-6 text-white shrink-0">
                  <h2 className="text-xl font-black tracking-tight">Detail Jenis Surat</h2>
               </div>
-              <div className="p-10 space-y-8">
+              <div className="p-6 sm:p-10 space-y-6 sm:space-y-8 overflow-y-auto">
                  <div className="grid grid-cols-2 gap-8">
                     <div>
                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kode Surat</p>
@@ -414,7 +414,7 @@ export default function ManajemenJenisSurat() {
       {showModal === 'delete' && selected && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
            <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowModal(null)}></div>
-           <div className="relative bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] p-10 text-center shadow-2xl transition-colors">
+           <div className="relative bg-white dark:bg-slate-900 w-full max-w-sm max-h-[90vh] flex flex-col rounded-[2.5rem] p-6 sm:p-10 text-center shadow-2xl transition-colors overflow-y-auto">
               <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
               </div>
