@@ -32,6 +32,8 @@ export default function LoginPage() {
         window.location.href = '/dashboard/mahasiswa';
       } else if (userRole === 'tendik') {
         window.location.href = '/dashboard/tendik';
+      } else if (userRole === 'kaprodi') {
+        window.location.href = '/dashboard/kaprodi';
       } else {
         window.location.href = '/dashboard';
       }
