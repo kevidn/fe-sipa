@@ -3,12 +3,24 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+interface Surat {
+  id: number;
+  nomor_surat: string;
+  jenis_surat: string;
+  created_at: string;
+  deadline_sla?: string;
+  User?: {
+    nama_lengkap: string;
+  };
+}
+
 interface Stats {
   total_pengajuan: number;
   selesai: number;
   dalam_proses: number;
   ditolak: number;
   sla_terlampaui: number;
+  sla_terlampaui_list?: Surat[];
 }
 
 export default function DashboardKaprodi() {
@@ -252,44 +264,37 @@ export default function DashboardKaprodi() {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
-                      <tr className="hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all">
-                         <td className="px-8 py-5 font-black text-slate-800 dark:text-slate-200 text-sm">SKM-2024-125</td>
-                         <td className="px-8 py-5 font-medium text-slate-600 dark:text-slate-300 text-sm">Surat Keterangan Masih Kuliah</td>
-                         <td className="px-8 py-5 font-bold text-slate-800 dark:text-slate-200 text-sm">Siti Nurhaliza</td>
-                         <td className="px-8 py-5 text-center">
-                            <span className="inline-block px-3 py-1.5 rounded-lg text-[10px] font-black bg-red-50 dark:bg-red-500/10 text-red-600">2 hari</span>
-                         </td>
-                         <td className="px-8 py-5 text-center">
-                            <Link href="#" className="text-emerald-600 font-black text-xs hover:underline uppercase tracking-widest">Lihat Detail</Link>
-                         </td>
-                      </tr>
-                      <tr className="hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all">
-                         <td className="px-8 py-5 font-black text-slate-800 dark:text-slate-200 text-sm">SKRIPSI-2024-089</td>
-                         <td className="px-8 py-5 font-medium text-slate-600 dark:text-slate-300 text-sm">Surat Ijin Survei Penelitian</td>
-                         <td className="px-8 py-5 font-bold text-slate-800 dark:text-slate-200 text-sm">Muhammad Iqbal</td>
-                         <td className="px-8 py-5 text-center">
-                            <span className="inline-block px-3 py-1.5 rounded-lg text-[10px] font-black bg-red-50 dark:bg-red-500/10 text-red-600">1 hari</span>
-                         </td>
-                         <td className="px-8 py-5 text-center">
-                            <Link href="#" className="text-emerald-600 font-black text-xs hover:underline uppercase tracking-widest">Lihat Detail</Link>
-                         </td>
-                      </tr>
-                      <tr className="hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all">
-                         <td className="px-8 py-5 font-black text-slate-800 dark:text-slate-200 text-sm">BEA-2024-067</td>
-                         <td className="px-8 py-5 font-medium text-slate-600 dark:text-slate-300 text-sm">Surat Rekomendasi Beasiswa</td>
-                         <td className="px-8 py-5 font-bold text-slate-800 dark:text-slate-200 text-sm">Dina Amelia</td>
-                         <td className="px-8 py-5 text-center">
-                            <span className="inline-block px-3 py-1.5 rounded-lg text-[10px] font-black bg-red-50 dark:bg-red-500/10 text-red-600">3 hari</span>
-                         </td>
-                         <td className="px-8 py-5 text-center">
-                            <Link href="#" className="text-emerald-600 font-black text-xs hover:underline uppercase tracking-widest">Lihat Detail</Link>
-                         </td>
-                      </tr>
+                      {stats?.sla_terlampaui_list && stats.sla_terlampaui_list.length > 0 ? (
+                         stats.sla_terlampaui_list.map((item) => {
+                            let keterlambatan = "N/A";
+                            if (item.deadline_sla) {
+                               const diff = Math.floor((new Date().getTime() - new Date(item.deadline_sla).getTime()) / (1000 * 3600 * 24));
+                               if (diff > 0) keterlambatan = `${diff} hari`;
+                            }
+                            return (
+                               <tr key={item.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all">
+                                  <td className="px-8 py-5 font-black text-slate-800 dark:text-slate-200 text-sm">{item.nomor_surat}</td>
+                                  <td className="px-8 py-5 font-medium text-slate-600 dark:text-slate-300 text-sm">{item.jenis_surat}</td>
+                                  <td className="px-8 py-5 font-bold text-slate-800 dark:text-slate-200 text-sm">{item.User?.nama_lengkap || '-'}</td>
+                                  <td className="px-8 py-5 text-center">
+                                     <span className="inline-block px-3 py-1.5 rounded-lg text-[10px] font-black bg-red-50 dark:bg-red-500/10 text-red-600">{keterlambatan}</span>
+                                  </td>
+                                  <td className="px-8 py-5 text-center">
+                                     <Link href={`/dashboard/kaprodi/monitoring/${item.id}`} className="text-emerald-600 font-black text-xs hover:underline uppercase tracking-widest">Lihat Detail</Link>
+                                  </td>
+                               </tr>
+                            );
+                         })
+                      ) : (
+                         <tr>
+                            <td colSpan={5} className="px-8 py-8 text-center text-slate-400 text-sm font-bold">Tidak ada pengajuan yang melampaui SLA saat ini</td>
+                         </tr>
+                      )}
                    </tbody>
                 </table>
              </div>
              <div className="p-6 border-t border-slate-50 dark:border-slate-800/50 bg-slate-50/30 dark:bg-slate-800/20">
-                <p className="text-xs font-bold text-slate-400 text-center">Menampilkan 3 pengajuan yang melampaui SLA</p>
+                <p className="text-xs font-bold text-slate-400 text-center">Menampilkan {stats?.sla_terlampaui_list?.length || 0} pengajuan yang melampaui SLA</p>
              </div>
           </div>
 

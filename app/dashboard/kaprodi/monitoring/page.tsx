@@ -18,7 +18,10 @@ interface Pengajuan {
   user: User;
 }
 
+import { useRouter } from 'next/navigation';
+
 export default function MonitoringSLA() {
+  const router = useRouter();
   const [pengajuan, setPengajuan] = useState<Pengajuan[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -89,7 +92,11 @@ export default function MonitoringSLA() {
                   ) : pengajuan.length === 0 ? (
                      <tr><td colSpan={6} className="py-20 text-center font-bold text-slate-400">Tidak ada pengajuan aktif</td></tr>
                   ) : pengajuan.map((item) => (
-                     <tr key={item.id} className="hover:bg-slate-50/30 transition-all">
+                     <tr 
+                        key={item.id} 
+                        onClick={() => router.push(`/dashboard/kaprodi/monitoring/${item.id}`)}
+                        className="hover:bg-slate-50/30 transition-all cursor-pointer"
+                     >
                         <td className="px-8 py-6">{getSlaBadge(item.sla_status)}</td>
                         <td className="px-8 py-6 font-black text-slate-800 text-sm">{item.nomor_surat}</td>
                         <td className="px-8 py-6">
