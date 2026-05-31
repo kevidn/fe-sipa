@@ -36,7 +36,8 @@ export default function RegisterPage() {
           username: formData.nim,
           email: formData.email,
           role: formData.role,
-          password: formData.password
+          password: formData.password,
+          program_studi: formData.program_studi
         }),
       });
 
