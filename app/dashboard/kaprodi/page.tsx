@@ -160,7 +160,7 @@ export default function DashboardKaprodi() {
                 <p className="text-xs font-medium text-slate-400 mb-8">Perbandingan total pengajuan dengan yang selesai dan terlampaui SLA</p>
                 
                 {/* Mock Chart Area */}
-                <div className="h-48 md:h-64 w-full flex items-end gap-2 sm:gap-6 border-b border-l border-slate-200 dark:border-slate-700 pb-2 pl-2 relative ml-4">
+                <div className="h-48 md:h-64 w-full flex items-end gap-2 sm:gap-6 border-b border-l border-slate-200 dark:border-slate-700 pb-2 pl-2 relative ml-4 group cursor-pointer">
                    {/* Y Axis Labels */}
                    <div className="absolute left-[-20px] top-0 bottom-0 flex flex-col justify-between text-[10px] font-bold text-slate-400 h-full pb-2">
                       <span>80</span>
@@ -180,10 +180,18 @@ export default function DashboardKaprodi() {
                    </div>
 
                    {/* Bars (Mock Data) */}
-                   <div className="flex-1 flex justify-center items-end h-full z-10 gap-1 sm:gap-2">
+                   <div className="flex-1 flex justify-center items-end h-full z-10 gap-1 sm:gap-2 transition-transform duration-300 group-hover:scale-[1.02]">
                       <div className="w-8 sm:w-16 bg-blue-500 rounded-t-sm" style={{height: '92%'}}></div>
                       <div className="w-8 sm:w-16 bg-emerald-500 rounded-t-sm" style={{height: '85%'}}></div>
                       <div className="w-8 sm:w-16 bg-red-500 rounded-t-sm" style={{height: '10%'}}></div>
+                   </div>
+
+                   {/* Tooltip */}
+                   <div className="absolute top-4 right-1/4 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 p-4 z-20 pointer-events-none whitespace-nowrap">
+                      <p className="text-base font-medium text-slate-800 dark:text-slate-200 mb-2">Mar</p>
+                      <p className="text-sm font-medium text-blue-500 mb-1.5">Total Pengajuan : 72</p>
+                      <p className="text-sm font-medium text-emerald-500 mb-1.5">Selesai : 68</p>
+                      <p className="text-sm font-medium text-red-500">SLA Terlampaui : 4</p>
                    </div>
                 </div>
                 {/* X Axis Label */}
@@ -204,9 +212,9 @@ export default function DashboardKaprodi() {
                 <h3 className="text-xl font-black text-slate-800 dark:text-slate-100">Distribusi Jenis Surat</h3>
                 <p className="text-xs font-medium text-slate-400 mb-8">Periode Maret 2024</p>
                 
-                <div className="flex justify-center mb-10 flex-1 items-center">
+                <div className="flex justify-center mb-10 flex-1 items-center relative group cursor-pointer">
                    {/* CSS Pie Chart Mock */}
-                   <div className="w-48 h-48 rounded-full shadow-inner relative overflow-hidden" style={{
+                   <div className="w-48 h-48 rounded-full shadow-inner relative overflow-hidden transition-transform duration-300 group-hover:scale-105" style={{
                       background: 'conic-gradient(#10b981 0% 35%, #8b5cf6 35% 44%, #f59e0b 44% 63%, #3b82f6 63% 88%, #64748b 88% 100%)'
                    }}>
                       <div className="absolute inset-0 flex items-center justify-center">
@@ -218,6 +226,13 @@ export default function DashboardKaprodi() {
                       <span className="absolute bottom-8 right-8 text-[10px] font-black text-white drop-shadow-md">9%</span>
                       <span className="absolute bottom-4 left-14 text-[10px] font-black text-white drop-shadow-md">19%</span>
                       <span className="absolute top-16 left-4 text-[10px] font-black text-white drop-shadow-md">25%</span>
+                   </div>
+
+                   {/* Tooltip */}
+                   <div className="absolute opacity-0 group-hover:opacity-100 transition-all duration-300 bg-white dark:bg-slate-800 shadow-2xl border border-slate-200 dark:border-slate-700 py-3 px-5 z-20 pointer-events-none whitespace-nowrap -translate-y-4 group-hover:-translate-y-0">
+                      <p className="text-base font-medium text-slate-800 dark:text-slate-200">
+                         Surat Keterangan Masih Kuliah : 120
+                      </p>
                    </div>
                 </div>
 
