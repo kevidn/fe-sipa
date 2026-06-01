@@ -8,24 +8,24 @@ export const printKitir = (data: any) => {
         <title>Kitir Digital - ${data.nomor_surat}</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
         <style>
-          body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; line-height: 1.5; }
-          .container { max-width: 800px; margin: 0 auto; border: 2px solid #e2e8f0; border-radius: 24px; padding: 40px; position: relative; overflow: hidden; }
-          .header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 30px; }
-          .logo { width: 60px; h-height: 60px; background: #00aa5b; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 24px; }
+          body { font-family: 'Inter', sans-serif; padding: 20px; color: #1e293b; line-height: 1.4; }
+          .container { max-width: 800px; margin: 0 auto; border: 2px solid #e2e8f0; border-radius: 24px; padding: 30px; position: relative; overflow: hidden; }
+          .header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 25px; }
+          .logo { width: 60px; height: 60px; background: #00aa5b; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 900; font-size: 24px; }
           .title { flex: 1; }
           .title h1 { margin: 0; font-size: 20px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
           .title p { margin: 5px 0 0; font-size: 12px; color: #64748b; font-weight: 700; }
           
-          .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
-          .info-group { margin-bottom: 20px; }
+          .grid { display: grid; grid-template-cols: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
+          .info-group { margin-bottom: 15px; }
           .label { font-size: 10px; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
           .value { font-size: 14px; font-weight: 700; color: #1e293b; }
           
-          .status-box { background: #f8fafc; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 40px; }
+          .status-box { background: #f8fafc; border-radius: 16px; padding: 15px; border: 1px solid #e2e8f0; margin-bottom: 25px; }
           .status-label { font-size: 12px; font-weight: 900; color: #64748b; margin-bottom: 10px; }
           .status-value { display: inline-block; padding: 6px 16px; border-radius: 99px; background: #ecfdf5; color: #059669; font-size: 12px; font-weight: 900; text-transform: uppercase; }
           
-          .footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #f1f5f9; pt: 30px; margin-top: 40px; }
+          .footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 2px solid #f1f5f9; padding-top: 20px; margin-top: 25px; }
           .qr-code { width: 100px; height: 100px; border: 1px solid #e2e8f0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #94a3b8; text-align: center; padding: 10px; }
           .signature { text-align: right; }
           .signature-label { font-size: 12px; font-weight: 700; margin-bottom: 60px; }

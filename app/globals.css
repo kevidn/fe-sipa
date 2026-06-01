@@ -26,6 +26,15 @@
   --body-text: #f8fafc;
 }
 
+/* Global fix for select dropdowns in dark mode */
+.dark select {
+  color-scheme: dark;
+}
+.dark select option {
+  background-color: #0f172a; /* slate-900 */
+  color: #f8fafc;
+}
+
 body {
   font-family: var(--font-poppins), 'Inter', Arial, Helvetica, sans-serif;
   background-color: var(--body-bg);
