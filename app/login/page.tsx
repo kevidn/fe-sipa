@@ -29,13 +29,15 @@ export default function LoginPage() {
 
       const userRole = data.data.role.toLowerCase();
       if (userRole === 'mahasiswa') {
-        window.location.href = '/dashboard/mahasiswa';
+        window.location.href = '/mahasiswa';
       } else if (userRole === 'tendik') {
-        window.location.href = '/dashboard/tendik';
+        window.location.href = '/tendik';
       } else if (userRole === 'kaprodi') {
-        window.location.href = '/dashboard/kaprodi';
+        window.location.href = '/kaprodi';
+      } else if (userRole === 'admin sistem') {
+        window.location.href = '/admin';
       } else {
-        window.location.href = '/dashboard';
+        window.location.href = '/';
       }
     } catch (err: any) {
       setError(err.message);

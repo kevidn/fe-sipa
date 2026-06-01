@@ -253,7 +253,7 @@ export default function DashboardHeader() {
                 </div>
                 
                 <div className="p-3 border-t border-slate-100 dark:border-slate-800 text-center bg-slate-50/50 dark:bg-slate-800/50">
-                   <Link href="/dashboard/notifikasi" className="text-xs font-bold text-sipa-green hover:underline">
+                   <Link href="/notifikasi" className="text-xs font-bold text-sipa-green hover:underline">
                      Lihat Semua Riwayat
                    </Link>
                 </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import CustomSelect from '@/components/CustomSelect';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -34,6 +35,7 @@ export default function RegisterPage() {
         body: JSON.stringify({
           nama_lengkap: formData.nama_lengkap,
           username: formData.nim,
+          nim: formData.nim,
           email: formData.email,
           role: formData.role,
           password: formData.password,
@@ -183,17 +185,16 @@ export default function RegisterPage() {
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sipa-green transition-colors">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                     </div>
-                    <select 
-                      className="w-full pl-14 pr-6 py-3.5 rounded-2xl bg-slate-50 border-2 border-transparent focus:bg-white focus:border-sipa-green/20 outline-none transition-all font-medium text-slate-600 appearance-none"
+                    <CustomSelect 
                       value={formData.program_studi}
-                      onChange={(e) => setFormData({...formData, program_studi: e.target.value})}
-                      required
-                    >
-                      <option value="">Pilih Program Studi</option>
-                      <option>S1 Pendidikan Teknologi Informasi</option>
-                      <option>S1 Teknik Informatika</option>
-                      <option>S1 Sistem Informasi</option>
-                    </select>
+                      onChange={(val) => setFormData({...formData, program_studi: val})}
+                      options={[
+                        { value: '', label: 'Pilih Program Studi' },
+                        { value: 'S1 Pendidikan Teknologi Informasi', label: 'S1 Pendidikan Teknologi Informasi' },
+                        { value: 'S1 Teknik Informatika', label: 'S1 Teknik Informatika' },
+                        { value: 'S1 Sistem Informasi', label: 'S1 Sistem Informasi' }
+                      ]}
+                    />
                   </div>
                 </div>
               )}
