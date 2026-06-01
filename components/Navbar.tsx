@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,12 +14,17 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="landing-container nav-content">
         <div className="nav-logo">
-          <div className="logo-icon-circle">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          </div>
+          <Image 
+            src="/icon.png" 
+            alt="Logo SIPA UNESA" 
+            width={50} 
+            height={50} 
+            className="h-10 w-auto object-contain" 
+            priority 
+          />
           <div className="logo-text">
-            <strong>SIPA UNESA</strong>
-            <span>Sistem Pelayanan Akademik</span>
+            <strong>SIPA</strong>
+            <span>Sistem Informasi & Pengolahan Admisi</span>
           </div>
         </div>
         
