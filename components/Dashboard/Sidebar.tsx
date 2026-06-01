@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
 const getMenuItems = (role: string) => {
@@ -258,14 +259,17 @@ export default function Sidebar() {
       <aside className="w-72 bg-white dark:bg-slate-900 h-screen sticky top-0 border-r border-slate-100 dark:border-slate-800 flex flex-col z-40 transition-colors duration-300">
         {/* Brand */}
         <div className="p-8 flex items-center gap-4">
-          <div className="w-10 h-10 bg-sipa-green rounded-xl flex items-center justify-center shadow-lg shadow-sipa-green/20">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-            </svg>
-          </div>
+          <Image 
+            src="/icon.png" 
+            alt="Logo SIPA" 
+            width={50} 
+            height={50} 
+            className="h-12 w-auto object-contain" 
+            priority 
+          />
           <div>
-            <h1 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight leading-none">SIPA UNESA</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Sistem Pelayanan Akademik</p>
+            <h1 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight leading-none">SIPA</h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Sistem Informasi & Pengolahan Admisi</p>
           </div>
         </div>
 

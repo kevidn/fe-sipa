@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [nim, setNim] = useState('');
@@ -53,12 +54,17 @@ export default function LoginPage() {
         <div className="max-w-md mx-auto w-full space-y-10">
           {/* Logo & Brand */}
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-sipa-green rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-sipa-green/20">
-              SU
-            </div>
+            <Image 
+              src="/icon.png" 
+              alt="Logo SIPA" 
+              width={64} 
+              height={64} 
+              className="h-16 w-auto object-contain" 
+              priority 
+            />
             <div>
-              <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none uppercase">SIPA UNESA</h1>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Sistem Pelayanan Akademik</p>
+              <h1 className="text-xl font-black text-slate-800 tracking-tight leading-none uppercase">SIPA</h1>
+              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Sistem Informasi & Pengolahan Admisi</p>
             </div>
           </div>
 

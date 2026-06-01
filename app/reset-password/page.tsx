@@ -126,11 +126,19 @@ function ResetPasswordContent() {
 
       <main className="sipa-right">
         <div className="sipa-right-header">
-           <Link href="/" className="sipa-home-logo">
-            <div className="logo-icon">SU</div>
+           <Link href="/" className="sipa-home-logo" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Image 
+              src="/icon.png" 
+              alt="Logo SIPA" 
+              width={40} 
+              height={40} 
+              className="object-contain" 
+              style={{ height: '32px', width: 'auto' }}
+              priority 
+            />
             <div className="logo-text">
-              <strong>SIPA UNESA</strong>
-              <span>Sistem Pelayanan Akademik</span>
+              <strong>SIPA</strong>
+              <span>Sistem Informasi & Pengolahan Admisi</span>
             </div>
           </Link>
         </div>
