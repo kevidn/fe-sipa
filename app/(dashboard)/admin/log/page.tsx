@@ -34,6 +34,10 @@ export default function LogAktivitas() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   
+  const [filterUser, setFilterUser] = useState('Semua User');
+  const [filterAksi, setFilterAksi] = useState('Semua Aksi');
+  const [filterStatus, setFilterStatus] = useState('Semua Status');
+  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -91,11 +95,22 @@ export default function LogAktivitas() {
     return <svg className="text-blue-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
   };
 
-  const filteredLogs = logs.filter(log => 
-    log.aksi.toLowerCase().includes(search.toLowerCase()) || 
-    log.keterangan.toLowerCase().includes(search.toLowerCase()) ||
-    log.user.nama_lengkap.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredLogs = logs.filter(log => {
+    const userName = log.user?.nama_lengkap || '';
+    const matchSearch = log.aksi.toLowerCase().includes(search.toLowerCase()) || 
+                       log.keterangan.toLowerCase().includes(search.toLowerCase()) ||
+                       userName.toLowerCase().includes(search.toLowerCase());
+                       
+    const matchUser = filterUser === 'Semua User' || userName === filterUser;
+    const matchAksi = filterAksi === 'Semua Aksi' || log.aksi === filterAksi;
+    const matchStatus = filterStatus === 'Semua Status' || log.status === filterStatus;
+    
+    return matchSearch && matchUser && matchAksi && matchStatus;
+  });
+
+  const uniqueUsers = ['Semua User', ...Array.from(new Set(logs.map(log => log.user?.nama_lengkap).filter(Boolean)))];
+  const uniqueAksi = ['Semua Aksi', ...Array.from(new Set(logs.map(log => log.aksi)))];
+  const uniqueStatus = ['Semua Status', ...Array.from(new Set(logs.map(log => log.status)))];
 
   const totalPages = Math.ceil(filteredLogs.length / itemsPerPage);
   const paginatedLogs = filteredLogs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -111,7 +126,7 @@ export default function LogAktivitas() {
       item.id.toString(),
       item.aksi,
       item.keterangan,
-      item.user.nama_lengkap,
+      item.user?.nama_lengkap || "-",
       formatTanggalFull(item.created_at),
       item.referansi_id || "-",
       item.ip_address,
@@ -192,19 +207,19 @@ export default function LogAktivitas() {
             />
          </div>
          <CustomSelect 
-            value="Semua User"
-            onChange={() => {}}
-            options={[{ value: 'Semua User', label: 'Semua User' }]}
+            value={filterUser}
+            onChange={(val) => { setFilterUser(val); setCurrentPage(1); }}
+            options={uniqueUsers.map(u => ({ value: u, label: u }))}
          />
          <CustomSelect 
-            value="Semua Aksi"
-            onChange={() => {}}
-            options={[{ value: 'Semua Aksi', label: 'Semua Aksi' }]}
+            value={filterAksi}
+            onChange={(val) => { setFilterAksi(val); setCurrentPage(1); }}
+            options={uniqueAksi.map(a => ({ value: a, label: a }))}
          />
          <CustomSelect 
-            value="Semua Status"
-            onChange={() => {}}
-            options={[{ value: 'Semua Status', label: 'Semua Status' }]}
+            value={filterStatus}
+            onChange={(val) => { setFilterStatus(val); setCurrentPage(1); }}
+            options={uniqueStatus.map(s => ({ value: s, label: s }))}
          />
          <button 
             onClick={handleExportExcel}
@@ -240,7 +255,7 @@ export default function LogAktivitas() {
                            </div>
                            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                              {log.user.nama_lengkap}
+                              {log.user?.nama_lengkap || "Sistem"}
                            </div>
                            {log.referansi_id && (
                               <div className="flex items-center gap-1.5 text-[10px] font-black text-[#1c4ed8]">
