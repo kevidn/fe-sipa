@@ -86,7 +86,7 @@ export default function LogAktivitas() {
 
   const getIcon = (aksi: string, status: string) => {
     if (status === 'Gagal') return <svg className="text-red-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>;
-    if (aksi.includes('Pengajuan')) return <svg className="text-emerald-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>;
+    if (aksi.includes('Pengajuan')) return <svg className="text-[#1c4ed8]" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3"/></svg>;
     if (aksi.includes('Login')) return <svg className="text-purple-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>;
     return <svg className="text-blue-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
   };
@@ -140,18 +140,18 @@ export default function LogAktivitas() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Logs");
 
     // Write valid binary Excel file (triggers direct download without warnings)
-    XLSX.writeFile(workbook, `Data_Log_Aktivitas_${new Date().toISOString().slice(0,10)}.xlsx`);
+    XLSX.writeFile(workbook, `Data_Log_Aktivitas_Admin_${new Date().toISOString().slice(0,10)}.xlsx`);
   };
 
   return (
     <div className="space-y-8 pb-10">
       {/* Header */}
       <div className="space-y-1">
-        <Link href="/tendik" className="text-emerald-600 font-bold text-xs flex items-center gap-1 mb-2">
+        <Link href="/admin" className="text-[#1c4ed8] hover:text-blue-700 transition-colors font-bold text-xs flex items-center gap-1 mb-2">
            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
            Kembali ke Dashboard
         </Link>
-        <h1 className="text-4xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Log Aktivitas</h1>
+        <h1 className="text-4xl font-black text-[#1c4ed8] tracking-tight">Log Aktivitas</h1>
         <p className="text-slate-400 font-medium">Pantau semua aktivitas sistem SIPA UNESA</p>
       </div>
 
@@ -186,7 +186,7 @@ export default function LogAktivitas() {
             <input 
                type="text" 
                placeholder="Cari log..."
-               className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-emerald-500/20 text-sm font-medium dark:text-slate-200 placeholder:text-slate-400"
+               className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800 border-none focus:ring-2 focus:ring-[#1c4ed8]/20 text-sm font-medium dark:text-slate-200 placeholder:text-slate-400"
                value={search}
                onChange={(e) => setSearch(e.target.value)}
             />
@@ -208,7 +208,7 @@ export default function LogAktivitas() {
          />
          <button 
             onClick={handleExportExcel}
-            className="px-6 py-3 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center gap-2 hover:bg-emerald-700 transition-all"
+            className="px-6 py-3 rounded-xl bg-[#1c4ed8] text-white font-black text-xs flex items-center gap-2 hover:bg-blue-700 transition-all"
          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Ekspor
@@ -225,7 +225,7 @@ export default function LogAktivitas() {
             ) : paginatedLogs.length === 0 ? (
                <div className="py-20 text-center font-bold text-slate-400">Tidak ada log aktivitas</div>
             ) : paginatedLogs.map((log) => (
-               <div key={log.id} className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700/50 hover:border-emerald-200 transition-all group flex items-start justify-between">
+               <div key={log.id} className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700/50 hover:border-blue-200 transition-all group flex items-start justify-between">
                   <div className="flex items-start gap-6">
                      <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
                         {getIcon(log.aksi, log.status)}
@@ -243,7 +243,7 @@ export default function LogAktivitas() {
                               {log.user.nama_lengkap}
                            </div>
                            {log.referansi_id && (
-                              <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600">
+                              <div className="flex items-center gap-1.5 text-[10px] font-black text-[#1c4ed8]">
                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                                  #{log.referansi_id}
                               </div>
@@ -281,7 +281,7 @@ export default function LogAktivitas() {
                <select 
                  value={currentPage}
                  onChange={(e) => setCurrentPage(parseInt(e.target.value))}
-                 className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl px-5 py-2.5 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer text-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                 className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl px-5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#1c4ed8]/20 cursor-pointer text-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                >
                  {Array.from({ length: totalPages || 1 }).map((_, i) => (
                    <option key={i} value={i + 1}>Hal {i + 1}</option>

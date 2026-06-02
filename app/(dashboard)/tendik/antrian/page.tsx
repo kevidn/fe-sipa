@@ -36,6 +36,7 @@ export default function AntrianBaru() {
   const [filterJenis, setFilterJenis] = useState('Semua Jenis Surat');
   const [filterPrioritas, setFilterPrioritas] = useState('Semua Prioritas');
   const [sortConfig, setSortConfig] = useState({ key: 'tanggal_masuk', direction: 'desc' });
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -87,6 +88,22 @@ export default function AntrianBaru() {
     const matchesPrioritas = filterPrioritas === 'Semua Prioritas' || item.prioritas === filterPrioritas;
     return matchesSearch && matchesJenis && matchesPrioritas;
   });
+
+  const isAllSelected = filteredAntrian.length > 0 && selectedItems.length === filteredAntrian.length;
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedItems(filteredAntrian.map(item => item.id));
+    } else {
+      setSelectedItems([]);
+    }
+  };
+
+  const handleSelectItem = (id: number) => {
+    setSelectedItems(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
 
   return (
     <div className="space-y-8 pb-10">
@@ -172,7 +189,14 @@ export default function AntrianBaru() {
             <table className="w-full text-left border-collapse">
                <thead>
                    <tr className="bg-slate-50/50 dark:bg-slate-800/30">
-                     <th className="px-8 py-5 w-10"><input type="checkbox" className="rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-800 text-emerald-600 focus:ring-emerald-500"/></th>
+                     <th className="px-8 py-5 w-10">
+                       <input 
+                         type="checkbox" 
+                         checked={isAllSelected}
+                         onChange={handleSelectAll}
+                         className="rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-800 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                       />
+                     </th>
                      <th onClick={() => handleSort('sla')} className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                         <div className="flex items-center gap-1.5">SLA <span className={sortConfig.key === 'sla' ? 'text-emerald-500 text-xs' : 'text-slate-300 dark:text-slate-600 text-xs'}>{sortConfig.key === 'sla' ? (sortConfig.direction === 'asc' ? '↑' : '↓') : '↕'}</span></div>
                      </th>
@@ -200,7 +224,14 @@ export default function AntrianBaru() {
                   ) : (
                      filteredAntrian.map((item) => (
                         <tr key={item.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-all group">
-                           <td className="px-8 py-6"><input type="checkbox" className="rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-800 text-emerald-600 focus:ring-emerald-500"/></td>
+                           <td className="px-8 py-6">
+                             <input 
+                               type="checkbox" 
+                               checked={selectedItems.includes(item.id)}
+                               onChange={() => handleSelectItem(item.id)}
+                               className="rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-800 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                             />
+                           </td>
                            <td className="px-4 py-6">
                               <div className="flex items-center gap-2">
                                  <div className={`w-2.5 h-2.5 rounded-full ${

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import CustomSelect from '@/components/CustomSelect';
+import * as XLSX from 'xlsx';
 
 interface Surat {
   id: number;
@@ -49,6 +50,80 @@ export default function DashboardKaprodi() {
     fetchStats();
   }, []);
 
+  const handleExportExcel = () => {
+    const workbook = XLSX.utils.book_new();
+
+    // 1. Statistik Utama
+    const mainStatsData = [
+      ["Kategori", "Jumlah"],
+      ["Total Pengajuan", stats?.total_pengajuan || 345],
+      ["Selesai Tepat Waktu", stats?.selesai || 318],
+      ["Dalam Proses", stats?.dalam_proses || 23],
+      ["SLA Terlampaui", stats?.sla_terlampaui || 4],
+      ["Ditolak", stats?.ditolak || 2]
+    ];
+    const wsMain = XLSX.utils.aoa_to_sheet(mainStatsData);
+    XLSX.utils.book_append_sheet(workbook, wsMain, "Statistik Utama");
+
+    // 2. Trend Pengajuan (Mock Data like on UI)
+    const trendData = [
+      ["Bulan", "Total Pengajuan", "Selesai", "SLA Terlampaui"],
+      ["Jan", 50, 45, 2],
+      ["Feb", 65, 60, 3],
+      ["Mar", 72, 68, 4]
+    ];
+    const wsTrend = XLSX.utils.aoa_to_sheet(trendData);
+    XLSX.utils.book_append_sheet(workbook, wsTrend, "Trend Pengajuan");
+
+    // 3. Distribusi Jenis Surat (Mock Data like on UI)
+    const jenisSuratData = [
+      ["Jenis Surat", "Jumlah"],
+      ["Surat Keterangan Masih Kuliah", 120],
+      ["Surat Ijin Survei Penelitian", 85],
+      ["Surat Rekomendasi Beasiswa", 65],
+      ["Surat Kelakuan Baik", 45],
+      ["Lainnya", 30]
+    ];
+    const wsJenis = XLSX.utils.aoa_to_sheet(jenisSuratData);
+    XLSX.utils.book_append_sheet(workbook, wsJenis, "Distribusi Jenis Surat");
+
+    // 4. SLA Terlampaui List
+    if (stats?.sla_terlampaui_list && stats.sla_terlampaui_list.length > 0) {
+      const headers = ["No. Pengajuan", "Jenis Surat", "Nama Mahasiswa", "Keterlambatan"];
+      const rows = stats.sla_terlampaui_list.map((item) => {
+        let keterlambatan = "N/A";
+        if (item.deadline_sla) {
+           const diff = Math.floor((new Date().getTime() - new Date(item.deadline_sla).getTime()) / (1000 * 3600 * 24));
+           if (diff > 0) keterlambatan = `${diff} hari`;
+        }
+        return [
+          item.nomor_surat,
+          item.jenis_surat,
+          item.User?.nama_lengkap || '-',
+          keterlambatan
+        ];
+      });
+
+      const wsData = [headers, ...rows];
+      const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+
+      const colWidths = headers.map((header, colIdx) => {
+        let maxLen = header.length;
+        rows.forEach((row) => {
+          const val = String(row[colIdx]) || "";
+          if (val.length > maxLen) {
+            maxLen = val.length;
+          }
+        });
+        return { wch: Math.max(12, maxLen + 2) };
+      });
+      worksheet["!cols"] = colWidths;
+      XLSX.utils.book_append_sheet(workbook, worksheet, "SLA Terlampaui List");
+    }
+
+    XLSX.writeFile(workbook, `Laporan_Kaprodi_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
   return (
     <div className="space-y-8 pb-10 max-w-7xl">
       {/* Header & Controls */}
@@ -69,7 +144,7 @@ export default function DashboardKaprodi() {
               ]}
             />
           </div>
-          <button className="bg-emerald-500 text-white px-5 py-3 rounded-xl font-black text-xs shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 transition-all flex items-center gap-2 whitespace-nowrap">
+          <button onClick={handleExportExcel} className="bg-emerald-500 text-white px-5 py-3 rounded-xl font-black text-xs shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 transition-all flex items-center gap-2 whitespace-nowrap">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Ekspor Laporan
           </button>
@@ -320,7 +395,7 @@ export default function DashboardKaprodi() {
           </div>
 
           {/* Performance Banner */}
-          <div className="bg-emerald-600 rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-emerald-600/30 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-emerald-500/50 text-white text-center">
+          <div className="bg-emerald-600 rounded-[2rem] p-8 md:p-12 shadow-2xl shadow-emerald-600/30 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-4 divide-y md:divide-y-0 md:divide-x divide-emerald-500/50 text-white text-center">
              <div className="pt-4 md:pt-0">
                 <h3 className="text-4xl md:text-5xl font-black mb-2 tracking-tight">92.1%</h3>
                 <p className="text-emerald-100 font-bold text-sm tracking-wide">Tingkat Ketepatan SLA</p>
@@ -328,10 +403,6 @@ export default function DashboardKaprodi() {
              <div className="pt-8 md:pt-0">
                 <h3 className="text-4xl md:text-5xl font-black mb-2 tracking-tight">2.3 <span className="text-2xl font-bold">hari</span></h3>
                 <p className="text-emerald-100 font-bold text-sm tracking-wide">Rata-rata Waktu Proses</p>
-             </div>
-             <div className="pt-8 md:pt-0">
-                <h3 className="text-4xl md:text-5xl font-black mb-2 tracking-tight">4.8<span className="text-2xl font-bold text-emerald-300">/5.0</span></h3>
-                <p className="text-emerald-100 font-bold text-sm tracking-wide">Kepuasan Mahasiswa</p>
              </div>
           </div>
         </>

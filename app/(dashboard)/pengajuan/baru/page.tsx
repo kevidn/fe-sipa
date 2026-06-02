@@ -21,6 +21,7 @@ export default function AjukanSuratBaru() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState<{ show: boolean, type: 'success' | 'error', message: string }>({ show: false, type: 'success', message: '' });
+  const [activeRequests, setActiveRequests] = useState<any[]>([]);
 
   // Form State
   const [semester, setSemester] = useState('');
@@ -88,6 +89,24 @@ export default function AjukanSuratBaru() {
       }
     };
     fetchJenisSurat();
+
+    const fetchActiveRequests = async () => {
+      try {
+        const token = localStorage.getItem('sipa_token');
+        if (!token) return;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const active = (data.data || []).filter((item: any) => item.status !== 'Selesai' && item.status !== 'Ditolak');
+          setActiveRequests(active);
+        }
+      } catch (error) {
+        console.error('Failed to fetch active requests', error);
+      }
+    };
+    fetchActiveRequests();
   }, []);
 
   const handleFileChange = (requirement: string, file: File | null) => {
@@ -262,6 +281,21 @@ export default function AjukanSuratBaru() {
               </button>
             ))}
           </div>
+
+          {/* Active Request Warning */}
+          {selectedLetter && activeRequests.find(r => r.jenis_surat === selectedLetter) && (
+            <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl p-6 mb-8 flex gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="text-amber-500 mt-1">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+              <div>
+                <h4 className="text-amber-800 dark:text-amber-500 font-bold mb-1">Pengajuan Aktif Terdeteksi</h4>
+                <p className="text-amber-700/80 dark:text-amber-400 text-sm font-medium leading-relaxed">
+                  Anda sudah memiliki pengajuan aktif untuk jenis surat ini (No. {activeRequests.find(r => r.jenis_surat === selectedLetter).nomor_surat || 'Menunggu Penomoran'}). Selesaikan atau batalkan pengajuan tersebut sebelum mengajukan ulang.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Dynamic Form */}
           {selectedLetter && (

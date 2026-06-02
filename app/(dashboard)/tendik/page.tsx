@@ -36,6 +36,9 @@ export default function DashboardTendik() {
   const [filterJenis, setFilterJenis] = useState('Semua Jenis Surat');
   const [filterStatus, setFilterStatus] = useState('Semua Status');
   const [sortConfig, setSortConfig] = useState({ key: 'tanggal_masuk', direction: 'desc' });
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const fetchData = async () => {
     setLoading(true);
@@ -76,6 +79,10 @@ export default function DashboardTendik() {
     fetchData();
   }, [sortConfig]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filterJenis, filterStatus]);
+
   const filteredAntrian = antrian.filter((item) => {
     const matchesSearch = item.nomor_surat.toLowerCase().includes(search.toLowerCase()) || 
                           item.user.nama_lengkap.toLowerCase().includes(search.toLowerCase());
@@ -92,6 +99,9 @@ export default function DashboardTendik() {
 
     return matchesSearch && matchesJenis && matchesStatus;
   });
+
+  const totalPages = Math.ceil(filteredAntrian.length / itemsPerPage);
+  const paginatedAntrian = filteredAntrian.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const formatTanggal = (dateStr: string) => {
     return new Date(dateStr).toLocaleString('id-ID', {
@@ -277,12 +287,12 @@ export default function DashboardTendik() {
                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Sinkronisasi Data...</p>
                   </td>
                 </tr>
-              ) : filteredAntrian.length === 0 ? (
+              ) : paginatedAntrian.length === 0 ? (
                 <tr>
                    <td colSpan={7} className="px-8 py-20 text-center text-slate-400 font-bold">Tidak ada pengajuan ditemukan</td>
                 </tr>
               ) : (
-                filteredAntrian.map((item) => (
+                paginatedAntrian.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/30 dark:hover:bg-slate-800/30 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-2 whitespace-nowrap">
@@ -330,15 +340,34 @@ export default function DashboardTendik() {
         </div>
 
         {/* Footer Pagination */}
-        <div className="p-8 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between">
-           <p className="text-xs font-bold text-slate-400">Menampilkan 1 - 5 dari {filteredAntrian.length} pengajuan</p>
-           <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+        <div className="p-8 border-t border-slate-50 dark:border-slate-800/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+           <p className="text-xs font-bold text-slate-400">
+             Menampilkan {filteredAntrian.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(currentPage * itemsPerPage, filteredAntrian.length)} dari {filteredAntrian.length} pengajuan
+           </p>
+           <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
-              <button className="w-8 h-8 rounded-lg bg-emerald-600 text-white font-black text-xs">1</button>
-              <button className="w-8 h-8 rounded-lg bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 text-slate-400 font-bold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">2</button>
-              <button className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
+              
+              <select 
+                 value={currentPage}
+                 onChange={(e) => setCurrentPage(parseInt(e.target.value))}
+                 className="appearance-none bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl px-5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer text-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+               >
+                 {Array.from({ length: totalPages || 1 }).map((_, i) => (
+                   <option key={i} value={i + 1}>Hal {i + 1}</option>
+                 ))}
+               </select>
+
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
            </div>

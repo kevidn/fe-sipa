@@ -140,7 +140,7 @@ export default function PersetujuanSuratKaprodi() {
         <div className="bg-orange-50 dark:bg-orange-950/30 p-6 rounded-[2rem] border border-orange-200 dark:border-orange-900/50 flex justify-between items-center transition-transform hover:scale-[1.02] cursor-pointer">
            <div>
               <p className="text-sm font-bold text-orange-600 dark:text-orange-400 mb-1">Perlu Persetujuan</p>
-              <h3 className="text-5xl font-black text-orange-700 dark:text-orange-500">{stats.total > 0 ? stats.total : 5}</h3>
+              <h3 className="text-5xl font-black text-orange-700 dark:text-orange-500">{stats.total}</h3>
            </div>
            <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -151,7 +151,7 @@ export default function PersetujuanSuratKaprodi() {
         <div className="bg-red-50 dark:bg-red-950/30 p-6 rounded-[2rem] border border-red-200 dark:border-red-900/50 flex justify-between items-center transition-transform hover:scale-[1.02] cursor-pointer">
            <div>
               <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">Prioritas Urgent</p>
-              <h3 className="text-5xl font-black text-red-700 dark:text-red-500">{stats.urgent > 0 ? stats.urgent : 2}</h3>
+              <h3 className="text-5xl font-black text-red-700 dark:text-red-500">{stats.urgent}</h3>
            </div>
            <div className="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-red-500/30">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -162,7 +162,7 @@ export default function PersetujuanSuratKaprodi() {
         <div className="bg-blue-50 dark:bg-blue-950/30 p-6 rounded-[2rem] border border-blue-200 dark:border-blue-900/50 flex justify-between items-center transition-transform hover:scale-[1.02] cursor-pointer">
            <div>
               <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-1">Prioritas Normal</p>
-              <h3 className="text-5xl font-black text-blue-700 dark:text-blue-500">{stats.normal > 0 ? stats.normal : 3}</h3>
+              <h3 className="text-5xl font-black text-blue-700 dark:text-blue-500">{stats.normal}</h3>
            </div>
            <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
