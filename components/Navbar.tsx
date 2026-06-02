@@ -36,7 +36,7 @@ export default function Navbar() {
             <li><Link href="/register">Daftar</Link></li>
           </ul>
 
-          <Link href="/login" className="btn-login shadow-lg shadow-sipa-green/20">
+          <Link href="/login" className="bg-sipa-green text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-sipa-green/20">
             Login
           </Link>
         </div>
@@ -67,7 +67,7 @@ export default function Navbar() {
               <Link href="/register" onClick={() => setIsOpen(false)}>Daftar</Link>
             </li>
             <li className="mobile-btn-container">
-              <Link href="/login" className="btn-login-mobile" onClick={() => setIsOpen(false)}>
+              <Link href="/login" className="bg-sipa-green text-white block text-center px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-sipa-green/20 w-full" onClick={() => setIsOpen(false)}>
                 Login
               </Link>
             </li>

@@ -19,10 +19,10 @@ export default function Hero() {
               Digitalisasi proses pengajuan surat akademik dengan sistem workflow otomatis dan monitoring SLA real-time.
             </p>
             <div className="hero-actions">
-              <Link href="/login" className="btn-primary">
+              <Link href="/login" className="bg-sipa-green text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-sipa-green/20 hover:bg-emerald-700 transition-all flex items-center justify-center">
                 Mulai Sekarang →
               </Link>
-              <Link href="#tentang" className="btn-secondary">
+              <Link href="#tentang" className="bg-slate-100 text-slate-600 px-6 py-3 rounded-xl font-bold hover:bg-slate-200 transition-all flex items-center justify-center">
                 Pelajari Lebih Lanjut
               </Link>
             </div>
@@ -63,9 +63,10 @@ export default function Hero() {
               
               <div className="timeline">
                 {[
-                  { label: 'Pengajuan Diterima', time: '2 April 2024, 08:30', active: true },
-                  { label: 'Diproses Tendik', time: '2 April 2024, 10:15', active: true },
-                  { label: 'Surat Selesai', time: '2 April 2024, 14:00', active: true }
+                  { label: 'Pengajuan Dikirim', time: '2 April 2024, 08:30', active: true },
+                  { label: 'Diverifikasi Tendik', time: '2 April 2024, 09:45', active: true },
+                  { label: 'Surat Diproses / Dicetak', time: '2 April 2024, 12:00', active: true },
+                  { label: 'Surat Selesai / Siap Diunduh', time: '2 April 2024, 14:00', active: true }
                 ].map((item, idx) => (
                   <div key={idx} className={`timeline-item ${item.active ? 'active' : ''}`}>
                     <div className="time-icon">
