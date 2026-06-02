@@ -19,6 +19,7 @@ export default function ManajemenPengguna() {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('Semua');
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   
   // Modals state
@@ -38,7 +39,7 @@ export default function ManajemenPengguna() {
       if (search) params.append('search', search);
       if (roleFilter !== 'Semua') params.append('role', roleFilter);
       params.append('page', page.toString());
-      params.append('limit', '10');
+      params.append('limit', limit.toString());
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -57,7 +58,7 @@ export default function ManajemenPengguna() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, roleFilter]);
+  }, [search, roleFilter, limit]);
 
   useEffect(() => {
     // debounce search
@@ -65,7 +66,7 @@ export default function ManajemenPengguna() {
       fetchData();
     }, 300);
     return () => clearTimeout(timer);
-  }, [search, roleFilter, page]);
+  }, [search, roleFilter, page, limit]);
 
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,9 +342,27 @@ export default function ManajemenPengguna() {
         
         {/* Pagination Controls */}
         <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-slate-50/50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 gap-4">
-          <span className="text-sm font-medium text-slate-500">
-            Menampilkan Halaman <span className="font-bold text-slate-700 dark:text-slate-300">{page}</span> dari <span className="font-bold text-slate-700 dark:text-slate-300">{totalPages}</span>
-          </span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-slate-500">Tampilkan</span>
+              <select
+                value={limit}
+                onChange={(e) => setLimit(Number(e.target.value))}
+                className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+              <span className="text-sm font-medium text-slate-500">entri</span>
+            </div>
+            <span className="text-sm font-medium text-slate-500 hidden sm:inline-block">|</span>
+            <span className="text-sm font-medium text-slate-500">
+              Halaman <span className="font-bold text-slate-700 dark:text-slate-300">{page}</span> dari <span className="font-bold text-slate-700 dark:text-slate-300">{totalPages}</span>
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setPage(p => Math.max(1, p - 1))}

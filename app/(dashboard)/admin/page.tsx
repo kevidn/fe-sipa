@@ -92,150 +92,185 @@ export default function DashboardAdmin() {
     <div className="space-y-8 pb-10 relative">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-4xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Dashboard Admin</h1>
-        <p className="text-slate-400 font-medium">Selamat datang di panel administrasi SIPA UNESA</p>
+        <h1 className="text-4xl font-black text-blue-600 dark:text-blue-500 tracking-tight">Dashboard Administrator</h1>
+        <p className="text-slate-500 dark:text-slate-400 font-medium">Kelola sistem SIPA UNESA secara menyeluruh</p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Card 1 */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col transition-all cursor-default">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center shadow-sm">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        {/* Card 1: Total Pengguna */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between transition-all">
+          <div className="flex items-center gap-6 mb-4">
+            <div className="w-16 h-16 bg-blue-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
-            <span className="text-emerald-500 text-xs font-black tracking-widest uppercase mt-2">Aktif</span>
-          </div>
-          <div>
-            <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">Total Jenis Surat</p>
-            <p className="text-4xl font-black text-slate-800 dark:text-slate-100 my-1">{stats?.total_jenis_surat || 0}</p>
-            <p className="text-emerald-500 text-xs font-bold tracking-wide">{stats?.surat_aktif || 0} surat aktif</p>
-          </div>
-        </div>
-
-        {/* Card 2 */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col transition-all cursor-default">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center shadow-sm">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            </div>
-            <span className="text-blue-500 text-xs font-black tracking-widest uppercase mt-2">2026</span>
-          </div>
-          <div>
-            <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">Hari Libur</p>
-            <p className="text-4xl font-black text-slate-800 dark:text-slate-100 my-1">{stats?.total_hari_libur || 0}</p>
-            <p className="text-blue-500 text-xs font-bold tracking-wide">Terkonfigurasi</p>
-          </div>
-        </div>
-
-        {/* Card 3 */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col transition-all cursor-default">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-amber-50 dark:bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center shadow-sm">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </div>
-            <span className="text-amber-500 text-xs font-black tracking-widest uppercase mt-2">Rata-rata</span>
-          </div>
-          <div>
-            <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">SLA Rata-rata</p>
-            <p className="text-4xl font-black text-slate-800 dark:text-slate-100 my-1">{stats?.avg_sla || "0.0"}</p>
-            <p className="text-amber-500 text-xs font-bold tracking-wide">Hari kerja</p>
-          </div>
-        </div>
-
-        {/* Card 4 */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col transition-all cursor-default">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-12 h-12 bg-purple-50 dark:bg-purple-500/10 text-purple-500 rounded-2xl flex items-center justify-center shadow-sm">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            </div>
-            <span className="text-purple-500 text-xs font-black tracking-widest uppercase mt-2">Aktif</span>
+            <p className="text-5xl font-black text-slate-800 dark:text-slate-100">{stats?.total_pengguna || "0"}</p>
           </div>
           <div>
             <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">Total Pengguna</p>
-            <p className="text-4xl font-black text-slate-800 dark:text-slate-100 my-1">{stats?.total_pengguna || 0}</p>
-            <p className="text-purple-500 text-xs font-bold tracking-wide">{stats?.total_role || 0} role berbeda</p>
+            <p className="text-blue-500 text-xs font-bold mt-1">+12 bulan ini</p>
+          </div>
+        </div>
+
+        {/* Card 2: Total Pengajuan */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between transition-all">
+          <div className="flex items-center gap-6 mb-4">
+            <div className="w-16 h-16 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <p className="text-5xl font-black text-slate-800 dark:text-slate-100">{stats?.total_pengajuan || "0"}</p>
+          </div>
+          <div>
+            <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">Total Pengajuan</p>
+            <p className="text-blue-500 text-xs font-bold mt-1">+234 bulan ini</p>
+          </div>
+        </div>
+
+        {/* Card 3: Jenis Surat Aktif */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between transition-all">
+          <div className="flex items-center gap-6 mb-4">
+            <div className="w-16 h-16 bg-[#a855f7] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <p className="text-5xl font-black text-slate-800 dark:text-slate-100">{stats?.surat_aktif || "0"}</p>
+          </div>
+          <div>
+            <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">Jenis Surat Aktif</p>
+            <p className="text-blue-500 text-xs font-bold mt-1">Semua aktif</p>
+          </div>
+        </div>
+
+        {/* Card 4: Uptime Sistem */}
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col justify-between transition-all">
+          <div className="flex items-center gap-6 mb-4">
+            <div className="w-16 h-16 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <p className="text-5xl font-black text-slate-800 dark:text-slate-100">99.8%</p>
+          </div>
+          <div>
+            <p className="font-bold text-slate-500 dark:text-slate-400 text-sm">Uptime Sistem</p>
+            <p className="text-blue-500 text-xs font-bold mt-1">30 hari terakhir</p>
           </div>
         </div>
       </div>
 
-      {/* Aksi Cepat */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 transition-all">
-        <h2 className="text-sm font-black text-slate-800 dark:text-slate-100 mb-6">Aksi Cepat</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <button 
-            onClick={() => setIsSuratModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-[#00a651] hover:bg-[#008c44] text-white py-3 px-4 rounded-xl font-bold transition-colors text-sm shadow-lg shadow-emerald-500/30"
-          >
-            <span>+</span> Tambah Jenis Surat
-          </button>
-          
-          <button 
-            onClick={() => setIsLiburModalOpen(true)}
-            className="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 py-3 px-4 rounded-xl font-bold transition-all text-sm"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Tambah Hari Libur
-          </button>
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* System Health */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800">
+          <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-3 mb-8">
+            <svg className="text-blue-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            System Health
+          </h2>
+          <div className="space-y-4">
+            {[
+              { name: "Database", icon: "M21 5c0 1.1-4 2-9 2s-9-.9-9-2 4-2 9-2 9 .9 9 2zm0 0v14c0 1.1-4 2-9 2s-9-.9-9-2V5m18 7c0 1.1-4 2-9 2s-9-.9-9-2" },
+              { name: "Email Service", icon: "M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2l8 5 8-5" },
+              { name: "Authentication", icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" },
+              { name: "File Storage", icon: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M16 13H8 M16 17H8 M10 9H8" }
+            ].map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 font-bold">
+                  <svg className="text-emerald-500" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d={item.icon}/></svg>
+                  {item.name}
+                </div>
+                <span className="text-sm font-bold text-blue-500">Healthy</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-          <button className="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 py-3 px-4 rounded-xl font-bold transition-all text-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            Kelola Pengguna
-          </button>
-
-          <button className="flex items-center justify-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 py-3 px-4 rounded-xl font-bold transition-all text-sm">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            Pengaturan
-          </button>
+        {/* Quick Actions */}
+        <div className="lg:col-span-3 bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 flex flex-col">
+          <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-3 mb-8">
+            <svg className="text-purple-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+            <button onClick={() => setIsSuratModalOpen(true)} className="flex items-center gap-4 bg-blue-500 hover:bg-blue-600 text-white p-6 rounded-2xl transition-all shadow-lg shadow-blue-500/20 active:scale-95 text-left h-full">
+              <svg className="w-8 h-8 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span className="font-bold text-lg">Manajemen Jenis Surat</span>
+            </button>
+            <button className="flex items-center gap-4 bg-[#a855f7] hover:bg-[#9333ea] text-white p-6 rounded-2xl transition-all shadow-lg shadow-purple-500/20 active:scale-95 text-left h-full">
+              <svg className="w-8 h-8 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span className="font-bold text-lg">Pengaturan Sistem</span>
+            </button>
+            <button className="flex items-center gap-4 bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-2xl transition-all shadow-lg shadow-blue-600/20 active:scale-95 text-left h-full">
+              <svg className="w-8 h-8 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <span className="font-bold text-lg">Log Aktivitas</span>
+            </button>
+            <button className="flex items-center gap-4 bg-[#eab308] hover:bg-[#ca8a04] text-white p-6 rounded-2xl transition-all shadow-lg shadow-yellow-500/20 active:scale-95 text-left h-full">
+              <svg className="w-8 h-8 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="8" y2="16"/><line x1="16" y1="4" x2="16" y2="16"/></svg>
+              <span className="font-bold text-lg">Laporan Lengkap</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Aktivitas Terbaru */}
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 transition-all">
-        <h2 className="text-sm font-black text-slate-800 dark:text-slate-100 mb-6">Aktivitas Terbaru</h2>
+      <div className="bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 dark:shadow-slate-950/50 border border-slate-100 dark:border-slate-800 transition-all">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="text-xl font-black text-slate-800 dark:text-slate-100">Aktivitas Terbaru</h2>
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Log aktivitas sistem dalam 1 jam terakhir</p>
+          </div>
+          <button className="text-[#a855f7] dark:text-[#c084fc] text-sm font-bold hover:underline">
+            Lihat Semua &rarr;
+          </button>
+        </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           {stats?.recent_activities?.length > 0 ? (
             stats.recent_activities.map((activity: any) => {
               // Dynamic Icon Logic
-              let Icon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>;
+              let Icon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>;
               let colorClass = "bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400";
               
               const aksiLower = activity.aksi.toLowerCase();
-              if (aksiLower.includes('login')) {
-                Icon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>;
+              if (aksiLower.includes('login') || aksiLower.includes('melihat')) {
+                Icon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
                 colorClass = "bg-blue-50 text-blue-500 dark:bg-blue-500/10";
-              } else if (aksiLower.includes('libur')) {
-                Icon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+              } else if (aksiLower.includes('update') || aksiLower.includes('libur')) {
+                Icon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
                 colorClass = "bg-orange-50 text-orange-500 dark:bg-orange-500/10";
               } else if (aksiLower.includes('surat') || aksiLower.includes('pengajuan')) {
-                Icon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
+                Icon = <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
                 colorClass = "bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10";
-              } else if (aksiLower.includes('pengguna') || aksiLower.includes('user')) {
-                Icon = <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-                colorClass = "bg-purple-50 text-purple-500 dark:bg-purple-500/10";
               }
 
               return (
-              <div key={activity.id} className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800/80 last:border-0 last:pb-0">
-                <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center mt-1 ${colorClass}`}>
-                    {Icon}
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-800 dark:text-slate-100">{activity.aksi}</p>
-                    <p className="text-slate-400 text-sm font-medium mt-0.5">{activity.keterangan}</p>
-                  </div>
+              <div key={activity.id} className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800/80">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
+                  {Icon}
                 </div>
-                <span className="text-slate-400 text-xs font-bold tracking-wider">
-                  {new Date(activity.created_at).toLocaleDateString('id-ID')}
-                </span>
+                <div className="flex-1">
+                  <p className="font-bold text-slate-800 dark:text-slate-100 text-sm">
+                    {activity.user?.nama_lengkap || 'Admin System'}
+                  </p>
+                  <p className="text-slate-500 dark:text-slate-400 text-xs font-medium mt-0.5">{activity.aksi} {activity.keterangan}</p>
+                  <p className="text-slate-400 text-[10px] font-bold mt-1">
+                    {new Date(activity.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'})}
+                  </p>
+                </div>
               </div>
               );
             })
           ) : (
-            <p className="text-slate-400 text-sm">Belum ada aktivitas.</p>
+            <div className="p-8 text-center text-slate-500 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+              Belum ada aktivitas dalam 1 jam terakhir
+            </div>
           )}
+        </div>
+      </div>
+
+      {/* Mode Administrator Banner */}
+      <div className="bg-[#f3e8ff] dark:bg-purple-500/10 border border-[#e9d5ff] dark:border-purple-500/30 rounded-2xl p-6 flex items-start gap-4 shadow-sm mt-4">
+        <div className="text-purple-600 dark:text-purple-400 mt-1">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div>
+          <h4 className="text-purple-800 dark:text-purple-300 font-bold mb-1">Mode Administrator</h4>
+          <p className="text-purple-700/80 dark:text-purple-400/80 text-sm font-medium">Anda memiliki akses penuh ke semua konfigurasi sistem. Gunakan dengan bijak untuk menjaga integritas data.</p>
         </div>
       </div>
 

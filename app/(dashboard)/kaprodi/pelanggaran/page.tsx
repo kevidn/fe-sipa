@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import Link from 'next/link';
 import CustomSelect from '@/components/CustomSelect';
+import * as XLSX from 'xlsx';
 
 export default function DaftarPelanggaranSLA() {
   const [loading, setLoading] = useState(true);
@@ -191,6 +192,57 @@ export default function DaftarPelanggaranSLA() {
     return null;
   };
 
+  const handleExportExcel = () => {
+    if (!data.tableData || data.tableData.length === 0) {
+      alert("Tidak ada data pelanggaran untuk diekspor");
+      return;
+    }
+
+    const headers = [
+      "No. Pengajuan", 
+      "Jenis Surat", 
+      "Nama Mahasiswa", 
+      "NIM", 
+      "Target SLA (hari)", 
+      "Aktual (hari)", 
+      "Keterlambatan (hari)", 
+      "Severity", 
+      "Penyebab"
+    ];
+    
+    const rows = data.tableData.map((item: any) => [
+      item.nomor_surat || '(Menunggu Penomoran)',
+      item.jenis_surat,
+      item.user?.nama_lengkap || '-',
+      item.user?.nim || '-',
+      item.target_sla,
+      item.aktual_hari,
+      item.keterlambatan,
+      item.severity,
+      item.penyebab
+    ]);
+
+    const wsData = [headers, ...rows];
+    const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+
+    const colWidths = headers.map((header, colIdx) => {
+      let maxLen = header.length;
+      rows.forEach((row) => {
+        const val = String(row[colIdx]) || "";
+        if (val.length > maxLen) {
+          maxLen = val.length;
+        }
+      });
+      return { wch: Math.max(12, maxLen + 2) };
+    });
+    worksheet["!cols"] = colWidths;
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar Pelanggaran SLA");
+
+    XLSX.writeFile(workbook, `Pelanggaran_SLA_Kaprodi_${new Date().toISOString().slice(0,10)}.xlsx`);
+  };
+
   return (
     <div className="p-8 lg:p-12 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 font-poppins">
       
@@ -201,7 +253,7 @@ export default function DaftarPelanggaranSLA() {
           <p className="text-slate-500 font-medium mt-2">Monitoring dan analisis pengajuan yang melampaui target waktu SLA</p>
         </div>
         
-        <button className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 active:scale-95">
+        <button onClick={handleExportExcel} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 active:scale-95">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Ekspor Data
         </button>
