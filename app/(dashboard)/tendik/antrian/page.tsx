@@ -50,15 +50,17 @@ export default function AntrianBaru() {
         })
       ]);
 
-      if (resStats.ok) {
-        const data = await resStats.json();
-        setStats(data.data);
-      }
       if (resAntrian.ok) {
         const data = await resAntrian.json();
-        // Only show "Diajukan" status for this page
         const newOnly = data.data.filter((s: Pengajuan) => s.status === 'Diajukan');
         setAntrian(newOnly);
+
+        setStats({
+          total_antrian: newOnly.length,
+          prioritas_tinggi: newOnly.filter((s: Pengajuan) => s.prioritas === 'Tinggi').length,
+          dokumen_lengkap: newOnly.filter((s: Pengajuan) => s.is_document_complete).length,
+          sla_terlampaui: newOnly.filter((s: Pengajuan) => s.sla_status === 'Terlampaui').length
+        });
       }
     } catch (err) {
       console.error('Gagal mengambil data antrian:', err);

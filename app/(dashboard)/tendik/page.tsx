@@ -318,7 +318,7 @@ export default function DashboardTendik() {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex gap-2">
-                        <Link href={`/tendik/pengajuan/${item.id}`} className="text-blue-500 font-bold text-xs hover:underline">Verifikasi</Link>
+                        <Link href={`/tendik/verifikasi/${item.id}`} className="text-blue-500 font-bold text-xs hover:underline">Verifikasi</Link>
                         <Link href={`/tendik/pengajuan/${item.id}`} className="text-emerald-600 font-bold text-xs hover:underline">Detail</Link>
                       </div>
                     </td>

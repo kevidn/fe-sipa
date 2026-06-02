@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
-const getMenuItems = (role: string) => {
+const getMenuItems = (role: string, totalAntrian: number = 0) => {
   const normalizedRole = (role || '').toLowerCase();
   
   const roleSpecificItems = [];
@@ -55,7 +55,7 @@ const getMenuItems = (role: string) => {
       { 
         name: 'Antrian Pengajuan Baru', 
         href: '/tendik/antrian', 
-        badge: 8,
+        badge: totalAntrian > 0 ? totalAntrian : undefined,
         icon: (active: boolean) => (
           <svg className={`${active ? 'text-emerald-600' : 'text-slate-400'}`} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 12H2M22 12l-4 4M22 12l-4-4M2 12l4 4M2 12l4-4" strokeOpacity="0"/> {/* Hidden reference for layout */}
@@ -223,15 +223,33 @@ export default function Sidebar() {
   const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [totalAntrian, setTotalAntrian] = useState(0);
 
   useEffect(() => {
     const userDataStr = localStorage.getItem('sipa_user');
     if (userDataStr) {
-      setUser(JSON.parse(userDataStr));
+      const parsedUser = JSON.parse(userDataStr);
+      setUser(parsedUser);
+      
+      if (parsedUser.role && parsedUser.role.toLowerCase() === 'tendik') {
+        const fetchStats = async () => {
+          try {
+            const token = localStorage.getItem('sipa_token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/surat/stats`, {
+               headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+               const data = await res.json();
+               setTotalAntrian(data.data.total_antrian || 0);
+            }
+          } catch (err) {}
+        };
+        fetchStats();
+      }
     }
   }, []);
 
-  const menuItems = getMenuItems(user?.role || 'Mahasiswa');
+  const menuItems = getMenuItems(user?.role || 'Mahasiswa', totalAntrian);
 
   const confirmLogout = async () => {
     try {

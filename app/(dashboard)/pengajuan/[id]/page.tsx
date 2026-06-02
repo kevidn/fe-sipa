@@ -116,6 +116,18 @@ Surat ini telah diverifikasi secara digital.
     );
   }
 
+  const getParsedDocuments = (fileUrl: string | undefined) => {
+    if (!fileUrl) return [];
+    try {
+      const parsed = JSON.parse(fileUrl);
+      return Object.entries(parsed).map(([key, value]) => ({ name: key, url: value as string }));
+    } catch (e) {
+      return [{ name: 'Dokumen Pendukung', url: fileUrl }];
+    }
+  };
+
+  const documents = getParsedDocuments(data.file_url);
+
   return (
     <div className="space-y-6 pb-10">
       {/* Header / Breadcrumb */}
@@ -325,17 +337,18 @@ Surat ini telah diverifikasi secara digital.
               Unduh Ulang Kitir
             </button>
 
-            {data.file_url && (
+            {documents.map((doc, idx) => (
               <a 
-                href={data.file_url}
+                key={idx}
+                href={doc.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 px-6 rounded-2xl bg-white dark:bg-slate-800 border-2 border-indigo-500 text-indigo-600 font-black flex items-center justify-center gap-3 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Lihat Dokumen Pendukung
+                Lihat {doc.name}
               </a>
-            )}
+            ))}
 
             <p className="text-[10px] text-center text-slate-400 dark:text-slate-500 font-bold leading-relaxed px-4">
               File yang diunduh dalam format PDF dan telah dilengkapi dengan QR Code untuk verifikasi keaslian

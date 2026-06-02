@@ -32,7 +32,7 @@ export default function WorkspaceVerifikasi() {
   const [dynamicChecklist, setDynamicChecklist] = useState<{ id: string; label: string; checked: boolean }[]>([]);
   const [processing, setProcessing] = useState<'Diterima Tendik' | 'Ditolak' | null>(null);
 
-  const allChecked = dynamicChecklist.length > 0 ? dynamicChecklist.every(item => item.checked) : false;
+  const allChecked = dynamicChecklist.length > 0 ? dynamicChecklist.every(item => item.id === 'catatan_form' || item.checked) : false;
 
   const fetchDetail = async () => {
     setLoading(true);
@@ -71,39 +71,77 @@ export default function WorkspaceVerifikasi() {
   }, [id]);
 
   useEffect(() => {
-    if (Object.keys(documents).length > 0) {
-      const items: { id: string; label: string; checked: boolean }[] = [];
-      Object.keys(documents).forEach((docName) => {
-        if (docName.toLowerCase().includes("mahasiswa") || docName.toLowerCase().includes("ktm")) {
-          items.push(
-            { id: `${docName}_berlaku`, label: `${docName} masih berlaku`, checked: false },
-            { id: `${docName}_foto`, label: `Foto & data pada ${docName} jelas`, checked: false }
-          );
-        } else if (docName.toLowerCase().includes("krs") || docName.toLowerCase().includes("rencana studi")) {
-          items.push(
-            { id: `${docName}_aktif`, label: `${docName} semester berjalan aktif`, checked: false },
-            { id: `${docName}_valid`, label: `Tanda tangan/persetujuan pada ${docName} lengkap`, checked: false }
-          );
-        } else if (docName.toLowerCase().includes("transkrip")) {
-          items.push(
-            { id: `${docName}_sah`, label: `${docName} sah & berstempel resmi`, checked: false },
-            { id: `${docName}_ipk`, label: `IPK pada ${docName} sesuai syarat`, checked: false }
-          );
-        } else {
-          items.push(
-            { id: `${docName}_valid`, label: `Dokumen ${docName} valid & terbaca`, checked: false },
-            { id: `${docName}_asli`, label: `Keaslian berkas ${docName} sesuai`, checked: false }
-          );
-        }
-      });
-      // Always add general checks:
-      items.push(
-        { id: `status_aktif`, label: `Status mahasiswa aktif di sistem`, checked: false },
-        { id: `bebas_tunggakan`, label: `Bebas dari tunggakan administrasi`, checked: false }
-      );
+    if (data && data.jenis_surat) {
+      const jenis = data.jenis_surat;
+      let items: { id: string; label: string; checked: boolean }[] = [];
+
+      switch (jenis) {
+        case 'Surat Keterangan Masih Kuliah':
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'foto_ktm_jelas', label: 'Foto + KTM jelas dan muncul', checked: false },
+            { id: 'data_sesuai', label: 'Data sesuai dengan sistem', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false },
+            { id: 'catatan_form', label: 'Catatan form (opsional)', checked: false }
+          ];
+          break;
+        case 'Surat Ijin Survei Penelitian (Skripsi)':
+        case 'Surat Ijin Survei/Penelitian Skripsi':
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'surat_tugas', label: 'Surat tugas dari dosen pembimbing', checked: false },
+            { id: 'proposal', label: 'Proposal penelitian', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false }
+          ];
+          break;
+        case 'Surat Tunjangan/Pensiun/Akses':
+        case 'Surat Keterangan Tunjangan/Pensiun':
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'data_ortu', label: 'Data orang tua/wali sesuai sistem', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false }
+          ];
+          break;
+        case 'Surat Keterangan Tidak Menerima Beasiswa':
+        case 'Surat Keterangan Tidak Terima Beasiswa':
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'data_beasiswa', label: 'Data beasiswa sesuai sistem', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false }
+          ];
+          break;
+        case 'Surat Rekomendasi Beasiswa':
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'transkrip', label: 'Transkrip nilai terbaru', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'ipk_memenuhi', label: 'IPK memenuhi syarat', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false }
+          ];
+          break;
+        case 'Surat Keterangan Kelakuan Baik':
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'tanpa_pelanggaran', label: 'Tidak ada catatan pelanggaran', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false }
+          ];
+          break;
+        default:
+          items = [
+            { id: 'ktm_berlaku', label: 'KTM masih berlaku', checked: false },
+            { id: 'status_aktif', label: 'Status mahasiswa aktif', checked: false },
+            { id: 'bebas_tunggakan', label: 'Tidak ada tunggakan administrasi', checked: false }
+          ];
+          break;
+      }
       setDynamicChecklist(items);
     }
-  }, [documents]);
+  }, [data]);
 
   const handleToggleCheck = (idCheck: string) => {
     setDynamicChecklist(prev => prev.map(item => item.id === idCheck ? { ...item, checked: !item.checked } : item));
