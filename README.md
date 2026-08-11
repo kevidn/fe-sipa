@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SIPA Frontend (Sistem Informasi Pelayanan Akademik)
 
-## Getting Started
+This repository contains the frontend application for SIPA, a comprehensive academic and administrative information system designed to digitize and streamline university workflows[cite: 2]. Built with Next.js and TypeScript, the platform serves multiple user roles with tailored dashboards and secure access control[cite: 2].
 
-First, run the development server:
+## 🚀 Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Role-Based Access Control (RBAC):** Isolated dashboards and routing for different user types[cite: 2]:
+  - **Admin:** System settings, user management, global logs, and holiday scheduling[cite: 2].
+  - **Kaprodi (Head of Program):** Student monitoring, violation tracking (pelanggaran), and multi-level document approvals[cite: 2].
+  - **Tendik (Educational Staff):** Queue management (antrian), document verification, and administrative letter generation (surat)[cite: 2].
+  - **Mahasiswa (Students):** Submission of academic requests (pengajuan) and real-time status tracking[cite: 2].
+- **Secure Authentication Flow:** Complete login, registration, password recovery, and reset modules[cite: 2].
+- **Document & Queue Management:** Digital handling of student requests, verified step-by-step by the educational staff[cite: 2].
+
+## 🛠 Tech Stack
+
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)[cite: 2]
+- **Language:** TypeScript[cite: 2]
+- **Styling:** CSS / Tailwind CSS (configured with PostCSS)[cite: 2]
+- **Linting & Formatting:** ESLint[cite: 2]
+
+## 📂 Project Structure
+
+The project follows a standard Next.js App Router structure with customized route groups for role isolation[cite: 2]:
+
+```text
+├── app/
+│   ├── (dashboard)/      # Protected routes segmented by role[cite: 2]
+│   │   ├── admin/        # Admin dashboard[cite: 2]
+│   │   ├── kaprodi/      # Head of Program dashboard[cite: 2]
+│   │   ├── mahasiswa/    # Student dashboard[cite: 2]
+│   │   └── tendik/       # Staff dashboard[cite: 2]
+│   ├── login/            # Auth pages[cite: 2]
+│   ├── register/         # Registration pages[cite: 2]
+│   └── ...
+├── components/           # Reusable UI components (Sidebar, Navbar, CustomSelect, etc.)[cite: 2]
+├── hooks/                # Custom React hooks (e.g., useBodyScrollLock)[cite: 2]
+└── utils/                # Utility functions and helpers (e.g., printKitir)[cite: 2]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💻 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To get this project up and running locally, follow these steps:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
+Ensure you have [Node.js](https://nodejs.org/) installed (v18 or higher recommended).
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/yourusername/fe-sipa.git](https://github.com/yourusername/fe-sipa.git)
+   cd fe-sipa
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Install the dependencies[cite: 2]:
+   ```bash
+   npm install
+   # or yarn install / pnpm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory and configure your API endpoints and other secrets.
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:8000/api
+   # Add other required variables here
+   ```
 
-## Deploy on Vercel
+4. Start the development server[cite: 2]:
+   ```bash
+   npm run dev
+   # or yarn dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+5. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
