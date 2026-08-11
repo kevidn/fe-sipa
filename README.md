@@ -1,43 +1,41 @@
 # SIPA Frontend (Sistem Informasi Pelayanan Akademik)
 
-This repository contains the frontend application for SIPA, a comprehensive academic and administrative information system designed to digitize and streamline university workflows[cite: 2]. Built with Next.js and TypeScript, the platform serves multiple user roles with tailored dashboards and secure access control[cite: 2].
+This repository contains the frontend application for SIPA, a comprehensive academic and administrative information system designed to digitize and streamline university workflows. Built with Next.js and TypeScript, the platform serves multiple user roles with tailored dashboards and secure access control.
 
 ## 🚀 Key Features
 
-- **Role-Based Access Control (RBAC):** Isolated dashboards and routing for different user types[cite: 2]:
-  - **Admin:** System settings, user management, global logs, and holiday scheduling[cite: 2].
-  - **Kaprodi (Head of Program):** Student monitoring, violation tracking (pelanggaran), and multi-level document approvals[cite: 2].
-  - **Tendik (Educational Staff):** Queue management (antrian), document verification, and administrative letter generation (surat)[cite: 2].
-  - **Mahasiswa (Students):** Submission of academic requests (pengajuan) and real-time status tracking[cite: 2].
-- **Secure Authentication Flow:** Complete login, registration, password recovery, and reset modules[cite: 2].
-- **Document & Queue Management:** Digital handling of student requests, verified step-by-step by the educational staff[cite: 2].
+- **Role-Based Access Control (RBAC):** Isolated dashboards and routing for different user types:
+  - **Admin:** System settings, user management, global logs, and holiday scheduling.
+  - **Kaprodi (Head of Program):** Student monitoring, violation tracking (pelanggaran), and multi-level document approvals.
+  - **Tendik (Educational Staff):** Queue management (antrian), document verification, and administrative letter generation (surat).
+  - **Mahasiswa (Students):** Submission of academic requests (pengajuan) and real-time status tracking.
+- **Secure Authentication Flow:** Complete login, registration, password recovery, and reset modules.
+- **Document & Queue Management:** Digital handling of student requests, verified step-by-step by the educational staff.
 
 ## 🛠 Tech Stack
 
-- **Framework:** [Next.js](https://nextjs.org/) (App Router)[cite: 2]
-- **Language:** TypeScript[cite: 2]
-- **Styling:** CSS / Tailwind CSS (configured with PostCSS)[cite: 2]
-- **Linting & Formatting:** ESLint[cite: 2]
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)
+- **Language:** TypeScript
+- **Styling:** CSS / Tailwind CSS (configured with PostCSS)
+- **Linting & Formatting:** ESLint
 
 ## 📂 Project Structure
 
-The project follows a standard Next.js App Router structure with customized route groups for role isolation[cite: 2]:
+The project follows a standard Next.js App Router structure with customized route groups for role isolation:
 
 ```text
 ├── app/
-│   ├── (dashboard)/      # Protected routes segmented by role[cite: 2]
-│   │   ├── admin/        # Admin dashboard[cite: 2]
-│   │   ├── kaprodi/      # Head of Program dashboard[cite: 2]
-│   │   ├── mahasiswa/    # Student dashboard[cite: 2]
-│   │   └── tendik/       # Staff dashboard[cite: 2]
-│   ├── login/            # Auth pages[cite: 2]
-│   ├── register/         # Registration pages[cite: 2]
+│   ├── (dashboard)/      # Protected routes segmented by role
+│   │   ├── admin/        # Admin dashboard
+│   │   ├── kaprodi/      # Head of Program dashboard
+│   │   ├── mahasiswa/    # Student dashboard
+│   │   └── tendik/       # Staff dashboard
+│   ├── login/            # Auth pages
+│   ├── register/         # Registration pages
 │   └── ...
-├── components/           # Reusable UI components (Sidebar, Navbar, CustomSelect, etc.)[cite: 2]
-├── hooks/                # Custom React hooks (e.g., useBodyScrollLock)[cite: 2]
-└── utils/                # Utility functions and helpers (e.g., printKitir)[cite: 2]
-```
-
+├── components/           # Reusable UI components (Sidebar, Navbar, CustomSelect, etc.)
+├── hooks/                # Custom React hooks (e.g., useBodyScrollLock)
+└── utils/                # Utility functions and helpers (e.g., printKitir)
 ## 💻 Getting Started
 
 To get this project up and running locally, follow these steps:
